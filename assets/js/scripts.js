@@ -44,7 +44,7 @@ var customRouteConnections = [];
 var showCoordinates = false;
 
 var toolType = '3'; //All type of tools
-var avaliableLanguages = ['ar-ar', 'de-de', 'en-us', 'es-es', 'fr-fr', 'it-it', 'pt-br', 'pl', 'ru', 'zh-s', 'zh-t'];
+var avaliableLanguages = ['ar-ar', 'de-de', 'en-us', 'es-es', 'fr-fr', 'it-it', 'pt-br', 'pl', 'ru', 'th-th', 'zh-s', 'zh-t'];
 var lang;
 
 var nazarLocations = [];
@@ -53,10 +53,10 @@ var nazarCurrentDate;
 
 var fastTravelData;
 
-var weeklySet = 'bowmans_set';
+var weeklySet = 'foundation_set';
 var weeklySetData = [];
 var date;
-var nocache = 112;
+var nocache = 114;
 
 var wikiLanguage = [];
 
@@ -84,6 +84,8 @@ function init() {
     toolType = $.cookie('tools');
   }
 
+  if($.cookie('disabled-categories') !== undefined)
+    categoriesDisabledByDefault = categoriesDisabledByDefault.concat($.cookie('disabled-categories').split(','));
 
   enabledCategories = enabledCategories.filter(function(item) {
     return categoriesDisabledByDefault.indexOf(item) === -1;
@@ -332,6 +334,9 @@ $('.menu-option.clickable').on('click', function() {
   } else {
     enabledCategories.push(menu.data('type'));
   }
+
+  $.cookie('disabled-categories', categories.filter(element => !enabledCategories.includes(element)).join(','))
+
   MapBase.addMarkers();
 
   if ($("#routes").val() == 1)
