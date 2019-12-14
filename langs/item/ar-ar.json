@@ -1423,5 +1423,17 @@
 	{"key": "egg_encounter.desc","value":"أماكن عشوائية. تشير النقطة البيضاء على الخريطة المصغرة إلى المكان. يجب أن تصل إلى عش البيض قبل أن يسرق البيض."},
 
 	{"key": "grave_robber.name","value":"مكان Grave Robber"},
-	{"key": "grave_robber.desc","value":"أماكن عشوائية. تشير النقطة البيضاء على الخريطة المصغرة إلى المكان. اقترب من grave robber لقبول المهمة. لديك وقت محدود للبحث عن ما يصل إلى 7 مواقع لعنصر يمكن تحصيله قبل وصول الشريف."}
+	{"key": "grave_robber.desc","value":"أماكن عشوائية. تشير النقطة البيضاء على الخريطة المصغرة إلى المكان. اقترب من grave robber لقبول المهمة. لديك وقت محدود للبحث عن ما يصل إلى 7 مواقع لعنصر يمكن تحصيله قبل وصول الشريف."},
+	
+	{"key": "condor_egg.name","value":"Condor Egg Event"},
+	{"key": "condor_egg.desc","value":"This is an event"},
+	
+	{"key": "dog_encounter.name","value":"Dog Encounter Event"},
+	{"key": "dog_encounter.desc","value":"This is a Random Encounter. A white blip on the mini map will indicate the encounter."},
+	
+	{"key": "fame_seeker.name","value":"Fame Seeker Event"},
+	{"key": "fame_seeker.desc","value":"This is a Random Encounter. A white blip on the mini map will indicate the encounter."},
+	
+	{"key": "wounded_animal.name","value":"Wounded Animal Event"},
+	{"key": "wounded_animal.desc","value":"This is a Random Encounter. A white blip on the mini map will indicate the encounter."}
 ]

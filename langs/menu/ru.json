@@ -18,7 +18,7 @@
 	{"key": "menu.card_wands", "value": "Карты Таро - Жезлы"},
 	{"key": "menu.search","value": "Поиск"},
 	{"key": "menu.settings", "value": "Настройки"},
-	{"key": "menu.day", "value": "День"},
+	{"key": "menu.day", "value": "Цикл"},
 	{"key": "menu.tool_type", "value": "Тип снаряж."},
 	{"key": "menu.tool_type.no_tools", "value": "Без снаряж."},
 	{"key": "menu.tool_type.shovel", "value": "Лопата"},
@@ -55,5 +55,15 @@
 	{"key": "menu.treasure_hunter", "value": "Охотники за сокровищем"},
 	{"key": "menu.tree_map", "value": "Карты сокровищ на дереве"},
 	{"key": "menu.egg_encounter", "value": "Птичьи гнезда"},
-	{"key": "menu.grave_robber", "value": "Ограбления могил"}
+	{"key": "menu.grave_robber", "value": "Ограбления могил"},
+	{"key": "menu.condor_egg", "value": "Яйцо Кондора"},
+	{"key": "menu.dog_encounter", "value": "Встреча с собакой"},
+	{"key": "menu.auto_refresh", "value": "Автомат. смена циклов"},
+	{"key": "menu.fame_seeker", "value": "Любительница славы"},
+	{"key": "menu.wounded_animal", "value": "Раненое животное"},
+	{"key": "menu.clear_inventory", "value": "Очистить инвентарь"},
+	{"key": "menu.sell", "value": "Продать набор"},
+	{"key": "menu.inventory", "value": "Инвентарь"},
+	{"key": "menu.enable_inventory", "value": "Вкл. инвентарь"},
+	{"key": "menu.inventory_stack", "value": "Макс. кол-во предметов в слоте"}
 ]
