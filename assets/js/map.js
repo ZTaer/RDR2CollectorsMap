@@ -61,8 +61,8 @@ var MapBase = {
       setMapBackground(e.name);
     });
 
-    var southWest = L.latLng(-170.712, -25.227),
-      northEast = L.latLng(10.774, 200.125),
+    var southWest = L.latLng(-160, -50),
+      northEast = L.latLng(25, 250),
       bounds = L.latLngBounds(southWest, northEast);
     MapBase.map.setMaxBounds(bounds);
   },
@@ -247,6 +247,9 @@ var MapBase = {
       case "day_8":
         return "lightred";
         break;
+      case "day_9":
+        return "darkblue";
+        break;
       case "weekly":
         return "green";
         break;
@@ -256,7 +259,7 @@ var MapBase = {
 
   updateMarkerContent: function (marker) {
     var videoText = marker.video != null ? '<p align="center" style="padding: 5px;"><a href="' + marker.video + '" target="_blank">Video</a></p>' : '';
-    var popupTitle = marker.category == 'random' ? marker.title : ` ${marker.title} - ${Language.get("menu.day")} ${Cycles.data.cycles[currentCycle][marker.category]}`;
+    var popupTitle = marker.category == 'random' ? marker.title : ` ${marker.title} - ${Language.get("menu.day")} ${marker.day}`;
     var popupContent = marker.category == 'random' ? 'Random items resets 24 hours after picking up' : marker.description;
     var buttons = marker.category == 'random' ? '' : `<div class="marker-popup-buttons">
     <button class="btn btn-danger" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', -1)">↓</button>
@@ -381,33 +384,33 @@ MapBase.addFastTravelMarker = function () {
   }
 };
 
-MapBase.submitDebugForm = function(){
+MapBase.submitDebugForm = function () {
   var lat = $('input[name=debug-marker-lat]').val();
   var lng = $('input[name=debug-marker-lng]').val();
-  if(!isNaN(lat) || !isNaN(lng))
+  if (!isNaN(lat) || !isNaN(lng))
     MapBase.debugMarker(lat, lng);
 },
 
-MapBase.debugMarker = function (lat, long) {
-  var marker = L.marker([lat, long], {
-    icon: L.icon({
-      iconUrl: './assets/images/icons/random_darkblue.png',
-      iconSize: [35, 45],
-      iconAnchor: [17, 42],
-      popupAnchor: [1, -32],
-      shadowAnchor: [10, 12],
-      shadowUrl: './assets/images/markers-shadow.png'
+  MapBase.debugMarker = function (lat, long) {
+    var marker = L.marker([lat, long], {
+      icon: L.icon({
+        iconUrl: './assets/images/icons/random_darkblue.png',
+        iconSize: [35, 45],
+        iconAnchor: [17, 42],
+        popupAnchor: [1, -32],
+        shadowAnchor: [10, 12],
+        shadowUrl: './assets/images/markers-shadow.png'
 
-    })
-  });
+      })
+    });
 
-  marker.bindPopup(`<h1>Debug Marker</h1><p>  </p>`);
-  Layers.itemMarkersLayer.addLayer(marker);
-};
+    marker.bindPopup(`<h1>Debug Marker</h1><p>  </p>`);
+    Layers.itemMarkersLayer.addLayer(marker);
+  };
 
 MapBase.addCoordsOnMap = function (coords) {
   // Show clicked coordinates (like google maps)
-  if (showCoordinates) {
+  if (Settings.isCoordsEnabled) {
     $('.lat-lng-container').css('display', 'block');
 
     $('.lat-lng-container p').html(`lat: ${coords.latlng.lat} <br> lng: ${coords.latlng.lng}`);

@@ -79,6 +79,54 @@
 			"card_pentacles"    : 3,
 			"card_swords"       : 3,
 			"card_wands"        : 3
+        },
+        "6": {
+            "american_flowers"  : 6,
+			"antique_bottles"   : 6,
+			"arrowhead"         : 3,
+			"bird_eggs"         : 2,
+			"coin"              : 5,
+			"family_heirlooms"  : 4,
+			"lost_bracelet"     : 2,
+			"lost_earrings"     : 2,
+			"lost_necklaces"    : 2,
+			"lost_ring"         : 2,
+			"card_cups"         : 2,
+			"card_pentacles"    : 2,
+			"card_swords"       : 2,
+			"card_wands"        : 2
+        },
+        "7": {
+            "american_flowers"  : 9,
+			"antique_bottles"   : 2,
+			"arrowhead"         : 2,
+			"bird_eggs"         : 3,
+			"coin"              : 2,
+			"family_heirlooms"  : 3,
+			"lost_bracelet"     : 1,
+			"lost_earrings"     : 1,
+			"lost_necklaces"    : 1,
+			"lost_ring"         : 1,
+			"card_cups"         : 5,
+			"card_pentacles"    : 5,
+			"card_swords"       : 5,
+			"card_wands"        : 5
+        },
+        "8": {
+            "american_flowers"  : 8,
+			"antique_bottles"   : 6,
+			"arrowhead"         : 1,
+			"bird_eggs"         : 2,
+			"coin"              : 4,
+			"family_heirlooms"  : 4,
+			"lost_bracelet"     : 2,
+			"lost_earrings"     : 2,
+			"lost_necklaces"    : 2,
+			"lost_ring"         : 2,
+			"card_cups"         : 4,
+			"card_pentacles"    : 4,
+			"card_swords"       : 4,
+			"card_wands"        : 4
         }
     }
 }
