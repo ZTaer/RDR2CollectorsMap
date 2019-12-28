@@ -3,9 +3,10 @@
  */
 
 var Layers = {
-  itemMarkersLayer: Settings.markerCluster ? L.markerClusterGroup({maxClusterRadius: 8}) : new L.LayerGroup(),
+  itemMarkersLayer: new L.LayerGroup(),
   miscLayer: new L.LayerGroup(),
-  encountersLayer: new L.LayerGroup()
+  encountersLayer: new L.LayerGroup(),
+  oms: null
 };
 
 var MapBase = {
@@ -65,6 +66,12 @@ var MapBase = {
       northEast = L.latLng(25, 250),
       bounds = L.latLngBounds(southWest, northEast);
     MapBase.map.setMaxBounds(bounds);
+
+    Layers.oms = new OverlappingMarkerSpiderfier(MapBase.map, { keepSpiderfied: true });
+    Layers.oms.addListener('spiderfy', function (markers) {
+      MapBase.map.closePopup();
+    });
+
   },
 
   loadMarkers: function () {
@@ -75,9 +82,12 @@ var MapBase = {
   },
 
   setMarkers: function (data) {
-    $.each(data, function (_category, _markers) {
-      $.each(_markers, function (key, marker) {
-        markers.push(new Marker(marker.text, marker.x, marker.y, marker.tool, marker.day, _category, marker.subdata, marker.video, true));
+    $.each(data, function (_category, _cycles) {
+      $.each(_cycles, function (day, _markers) {
+        $.each(_markers, function (key, marker) {
+          markers.push(new Marker(marker.text, marker.lat, marker.lng, marker.tool, day, _category, marker.subdata, marker.video, true));
+
+        });
       });
     });
     uniqueSearchMarkers = markers;
@@ -146,10 +156,10 @@ var MapBase = {
   loadWeeklySet: function () {
     $.getJSON('data/weekly.json?nocache=' + nocache)
       .done(function (data) {
-        weeklySetData = data[weeklySet];
+        weeklySetData = data;
       });
 
-    console.log('weekly set loaded');
+    console.log('weekly sets loaded');
   },
 
   removeItemFromMap: function (itemName, category) {
@@ -284,14 +294,14 @@ var MapBase = {
 
     if (parseInt(toolType) < parseInt(marker.tool)) return;
 
-    var isWeekly = weeklySetData.filter(weekly => {
+    var isWeekly = weeklySetData.sets[weeklySetData.current].filter(weekly => {
       return weekly.item === marker.text;
     }).length > 0;
 
     var tempMarker = L.marker([marker.lat, marker.lng], {
       opacity: marker.canCollect ? 1 : .35,
       icon: new L.Icon.DataMarkup({
-        iconUrl: './assets/images/icons/' + marker.category + '_' + (marker.category == 'random' ? 'lightgray' : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)) + '.png',
+        iconUrl: './assets/images/icons/' + marker.category + '_' + (marker.category == 'random' ? `lightgray_${marker.tool}` : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)) + '.png',
         iconSize: [35, 45],
         iconAnchor: [17, 42],
         popupAnchor: [1, -32],
@@ -304,7 +314,7 @@ var MapBase = {
     marker.isVisible = true;
 
     marker.title = (marker.category == 'random') ? Language.get("random_item.name") + marker.text.replace('random_item_', '') : Language.get(`${marker.text}.name`);
-    marker.description = Language.get(`${marker.text}_${marker.day}.desc`);;
+    marker.description = (marker.subdata == 'agarita' || marker.subdata == 'blood_flower' ? Language.get('map.night_only') : '') + Language.get(`${marker.text}_${marker.day}.desc`);
 
     tempMarker.bindPopup(MapBase.updateMarkerContent(marker))
       .on("click", function (e) {
@@ -312,6 +322,8 @@ var MapBase = {
         if (customRouteEnabled) e.target.closePopup();
       });
     Layers.itemMarkersLayer.addLayer(tempMarker);
+    if (Settings.markerCluster)
+      Layers.oms.addMarker(tempMarker);
   },
 
   save: function () {
@@ -336,6 +348,9 @@ var MapBase = {
       });
     });
     console.log('saved');
+  },
+  convertCoords: function (lat, lng) {
+    console.log(`"lat": "${0.01554 * lng + -63.6}", "lng": "${0.01554 * lat + 111.35}"`);
   }
 };
 
