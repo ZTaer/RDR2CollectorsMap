@@ -614,7 +614,7 @@
 	{"key": "coin_penny_5.desc", "value": ""},
 	{"key": "coin_penny_6.desc", "value": "At the base of the eastern large tree."},
 
-	{"key": "bottle_tennesee_whiskey.name", "value": "Tennesee Whiskey Bottle"},
+	{"key": "bottle_tennesee_whiskey.name", "value": "Tennessee Whiskey Bottle"},
 	{"key": "bottle_tennesee_whiskey_1.desc", "value": "On the dinner table inside."},
 	{"key": "bottle_tennesee_whiskey_2.desc", "value": "Inside building in cabinet in far right corner."},
 	{"key": "bottle_tennesee_whiskey_3.desc", "value": "In a cabinet in the livingroom."},
@@ -772,7 +772,7 @@
 	{"key": "arrowhead_flint_3.desc", "value": "Inbetween fallen trees."},
 	{"key": "arrowhead_flint_4.desc", "value": "Inbetween the boulder and the small rock."},
 	{"key": "arrowhead_flint_5.desc", "value": "At the base of the huge tree on the northwestern side."},
-	{"key": "arrowhead_flint_6.desc", "value": ""},
+	{"key": "arrowhead_flint_6.desc", "value": "Inside the cave."},
 
 	{"key": "arrowhead_agate.name", "value": "Agate Arrowhead"},
 	{"key": "arrowhead_agate_1.desc", "value": "Infront of the dead tree."},
@@ -830,7 +830,7 @@
 	{"key": "heirlooms_boxwood_comb_5.desc", "value": ""},
 	{"key": "heirlooms_boxwood_comb_6.desc", "value": ""},
 
-	{"key": "heirlooms_goat_hair_brush.name", "value": "Goat Hair Brush Heirloom"},
+	{"key": "heirlooms_goat_hair_brush.name", "value": "Goat Hairbrush Heirloom"},
 	{"key": "heirlooms_goat_hair_brush_1.desc", "value": "Upstairs on top of the fireplace."},
 	{"key": "heirlooms_goat_hair_brush_2.desc", "value": "On a dresser in bedroom 1 upstairs"},
 	{"key": "heirlooms_goat_hair_brush_3.desc", "value": "In a chest on the lower deck of the ship."},
@@ -878,7 +878,7 @@
 	{"key": "heirlooms_ivory_comb_5.desc", "value": ""},
 	{"key": "heirlooms_ivory_comb_6.desc", "value": ""},
 
-	{"key": "heirlooms_horse_hair_brush.name", "value": "Horse Hair Brush Heirloom"},
+	{"key": "heirlooms_horse_hair_brush.name", "value": "Horse Hairbrush Heirloom"},
 	{"key": "heirlooms_horse_hair_brush_1.desc", "value": "On a table on the deck."},
 	{"key": "heirlooms_horse_hair_brush_2.desc", "value": "In corner table of room upstairs in Saloon."},
 	{"key": "heirlooms_horse_hair_brush_3.desc", "value": "In the green cabinet next to the fireplace."},
@@ -886,7 +886,7 @@
 	{"key": "heirlooms_horse_hair_brush_5.desc", "value": ""},
 	{"key": "heirlooms_horse_hair_brush_6.desc", "value": ""},
 
-	{"key": "heirlooms_boar_bristle_brush.name", "value": "Boar Bristle Brush Heirloom"},
+	{"key": "heirlooms_boar_bristle_brush.name", "value": "Boar Bristle Hairbrush Heirloom"},
 	{"key": "heirlooms_boar_bristle_brush_1.desc", "value": "Inside house on a table."},
 	{"key": "heirlooms_boar_bristle_brush_2.desc", "value": "In the chair on the front porch."},
 	{"key": "heirlooms_boar_bristle_brush_3.desc", "value": "Inside chest left of house entrance."},
@@ -924,7 +924,7 @@
 	{"key": "ring_pilgrim_moonstone_3.desc", "value": "In the crater next to the central meteorite."},
 	{"key": "ring_pilgrim_moonstone_4.desc", "value": "Underneath the overhang."},
 	{"key": "ring_pilgrim_moonstone_5.desc", "value": "Next to the uprooted tree."},
-	{"key": "ring_pilgrim_moonstone_6.desc", "value": ""},
+	{"key": "ring_pilgrim_moonstone_6.desc", "value": "On a shelf in the shack."},
 
 	{"key": "ring_bonnard_pearl.name", "value": "Bonnard Pearl Ring"},
 	{"key": "ring_bonnard_pearl_1.desc", "value": "Inside the chimney."},
@@ -988,7 +988,7 @@
 	{"key": "ring_thorburn_turquoise_3.desc", "value": "Inside the house in the chimney."},
 	{"key": "ring_thorburn_turquoise_4.desc", "value": "Inside the wardrobe in the first room to the right."},
 	{"key": "ring_thorburn_turquoise_5.desc", "value": "Next to the log atop the plateau."},
-	{"key": "ring_thorburn_turquoise_6.desc", "value": ""},
+	{"key": "ring_thorburn_turquoise_6.desc", "value": "Underneath rail bridge."},
 
 	{"key": "necklace_blakely_miniatue.name", "value": "Blakely Miniature Necklace"},
 	{"key": "necklace_blakely_miniatue_1.desc", "value": "In a chest on a ridge next to a rotting elk."},
@@ -1131,8 +1131,8 @@
 	{"key": "earring_endicott_diamond_2.desc", "value": "in front of the southern \"John Doe\" grave."},
 	{"key": "earring_endicott_diamond_3.desc", "value": "between the rocks."},
 	{"key": "earring_endicott_diamond_4.desc", "value": "By the road sign."},
-	{"key": "earring_endicott_diamond_5.desc", "value": ""},
-	{"key": "earring_endicott_diamond_6.desc", "value": "At the end of the plateau overlooking the Elysian Pool."},
+	{"key": "earring_endicott_diamond_5.desc", "value": "At the end of the plateau overlooking the Elysian Pool."},
+	{"key": "earring_endicott_diamond_6.desc", "value": ""},
 
 	{"key": "earring_josephine_pearl.name", "value": "Josephine Pearl Earrings"},
 	{"key": "earring_josephine_pearl_1.desc", "value": "Inside the cave. Entrance above the \"A\" of Annesburg."},
@@ -1172,7 +1172,7 @@
 	{"key": "bracelet_ojeda_rose_gold_3.desc", "value": "Bottom of cliff."},
 	{"key": "bracelet_ojeda_rose_gold_4.desc", "value": "Next to the big stone near the road."},
 	{"key": "bracelet_ojeda_rose_gold_5.desc", "value": "In the corner of two fallen trees."},
-	{"key": "bracelet_ojeda_rose_gold_6.desc", "value": ""},
+	{"key": "bracelet_ojeda_rose_gold_6.desc", "value": "Inside the loft, in a chest."},
 
 	{"key": "bracelet_helena_sapphire.name", "value": "Helena Sapphire Bracelet"},
 	{"key": "bracelet_helena_sapphire_1.desc", "value": "In a lockbox left of the railroad at the entrance of the tunnel. Climb up the hill from the dotted path to the south and walk east on the railroad."},
@@ -1212,7 +1212,7 @@
 	{"key": "bracelet_hajnal_garnet_bangle_3.desc", "value": "In a lockbox underneath the bridge."},
 	{"key": "bracelet_hajnal_garnet_bangle_4.desc", "value": "By the small tree on the side of the road."},
 	{"key": "bracelet_hajnal_garnet_bangle_5.desc", "value": "At the base of the lone tree."},
-	{"key": "bracelet_hajnal_garnet_bangle_6.desc", "value": ""},
+	{"key": "bracelet_hajnal_garnet_bangle_6.desc", "value": "Is below rail bridge."},
 
 	{"key": "egg_duck.name", "value": "Duck Eggs"},
 	{"key": "egg_eagle.name", "value": "Eagle Egg"},

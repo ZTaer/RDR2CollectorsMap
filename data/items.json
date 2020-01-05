@@ -394,7 +394,7 @@
             { "text": "bottle_old_tom_gin", "tool": "0", "lat": "-75.0763", "lng": "140.4283", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=482s" },
             { "text": "bottle_gran_corazon_madeira", "tool": "0", "lat": "-63.6087", "lng": "152.2533", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=446s" },
             { "text": "bottle_scotch_whisky", "tool": "0", "lat": "-83.1169", "lng": "117.5386", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=383s" },
-            { "text": "bottle_tennesee_whiskey", "tool": "0", "lat": "-89.4997", "lng": "80.5307", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=335s" }
+            { "text": "bottle_tennesee_whiskey", "tool": "0", "lat": "-89.4921875", "lng": "80.609375", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=335s" }
         ],
         "3": [
             { "text": "bottle_caribbean_rum", "tool": "0", "lat": "-40.4808", "lng": "108.8587", "video": "https://www.youtube.com/watch?v=qfP3HwcG9Mc&t=806s" },
@@ -710,7 +710,7 @@
             { "text": "swords_four", "tool": "0", "lat": "-99.0992", "lng": "131.8703" },
             { "text": "swords_five", "tool": "0", "lat": "-41.2190", "lng": "158.2444" },
             { "text": "swords_six", "tool": "0", "lat": "-52.4087", "lng": "77.4260" },
-            { "text": "swords_seven", "tool": "0", "lat": "-44.9264", "lng": "89.0874" },
+            { "text": "swords_seven", "tool": "0", "lat": "-44.859375", "lng": "89.078125" },
             { "text": "swords_eight", "tool": "0", "lat": "-48.2118", "lng": "114.2903" },
             { "text": "swords_nine", "tool": "0", "lat": "-58.8511", "lng": "149.1719" },
             { "text": "swords_ten", "tool": "0", "lat": "-25.3836", "lng": "90.8263" },
@@ -901,15 +901,15 @@
             { "text": "ring_thorburn_turquoise", "tool": "2", "lat": "-42.9543", "lng": "147.4424" }
         ],
         "6": [
-            { "text": "ring_pilgrim_moonstone", "tool": "2", "lat": "-29.5739", "lng": "135.9431" },
+            { "text": "ring_pilgrim_moonstone", "tool": "0", "lat": "-29.5739", "lng": "135.9431" },
             { "text": "ring_sackville_diamond", "tool": "2", "lat": "-50.7015", "lng": "123.7823" },
-            { "text": "ring_yates_diamond", "tool": "2", "lat": "-65.8312", "lng": "130.1975" },
+            { "text": "ring_yates_diamond", "tool": "0", "lat": "-65.8312", "lng": "130.1975" },
             { "text": "ring_beaulieux_diamond", "tool": "2", "lat": "-92.6504", "lng": "141.7949" },
-            { "text": "ring_banais_topaz", "tool": "2", "lat": "-59.0912", "lng": "149.2109" },
+            { "text": "ring_banais_topaz", "tool": "0", "lat": "-59.0912", "lng": "149.2109" },
             { "text": "ring_bonnard_pearl", "tool": "2", "lat": "-110.1878", "lng": "52.0497" },
             { "text": "ring_harland_coral", "tool": "2", "lat": "-102.0172", "lng": "62.0546" },
             { "text": "ring_bosque_emerald", "tool": "2", "lat": "-113.7867", "lng": "17.8075" },
-            { "text": "ring_aubrey_onyx", "tool": "2", "lat": "-113.4101", "lng": "68.2165" },
+            { "text": "ring_aubrey_onyx", "tool": "0", "lat": "-113.4101", "lng": "68.2165" },
             { "text": "ring_magnate_turquoise", "tool": "2", "lat": "-75.4964", "lng": "146.1917" },
             { "text": "ring_thorburn_turquoise", "tool": "2", "lat": "-36.4884", "lng": "119.5731" }
         ]
@@ -1049,11 +1049,11 @@
             { "text": "bracelet_infanta_turquoise", "tool": "2", "lat": "-52.7348", "lng": "142.3590" },
             { "text": "bracelet_abello_ruby_bangle", "tool": "2", "lat": "-107.8306", "lng": "59.9837" },
             { "text": "bracelet_elliston_carved", "tool": "2", "lat": "-100.2322", "lng": "74.2739" },
-            { "text": "bracelet_ojeda_rose_gold", "tool": "2", "lat": "-36.6618", "lng": "105.0989" },
+            { "text": "bracelet_ojeda_rose_gold", "tool": "0", "lat": "-36.6618", "lng": "105.0989" },
             { "text": "bracelet_hajnal_garnet_bangle", "tool": "2", "lat": "-55.8723", "lng": "108.7367" },
             { "text": "bracelet_greco_sapphire", "tool": "2", "lat": "-56.7912", "lng": "157.2982" },
             { "text": "bracelet_helena_sapphire", "tool": "2", "lat": "-46.3946", "lng": "110.7151" },
-            { "text": "bracelet_durant_pearl", "tool": "2", "lat": "-76.9431", "lng": "148.1143" }
+            { "text": "bracelet_durant_pearl", "tool": "0", "lat": "-76.9431", "lng": "148.1143" }
         ]
     },
     "lost_necklaces": {
@@ -1119,8 +1119,8 @@
             { "text": "necklace_rou_pearl", "tool": "2", "lat": "-103.7754", "lng": "24.6360" },
             { "text": "necklace_gosselin_white_gold", "tool": "2", "lat": "-83.8318", "lng": "137.8756" },
             { "text": "necklace_pelle_pearl", "tool": "2", "lat": "-64.6906", "lng": "103.8027" },
-            { "text": "necklace_blakely_miniatue", "tool": "2", "lat": "-38.0243", "lng": "152.9576" },
-            { "text": "necklace_richelieu_amethyst", "tool": "2", "lat": "-55.2989", "lng": "154.4449" },
+            { "text": "necklace_blakely_miniatue", "tool": "0", "lat": "-38.0243", "lng": "152.9576" },
+            { "text": "necklace_richelieu_amethyst", "tool": "0", "lat": "-55.2989", "lng": "154.4449" },
             { "text": "necklace_dane_topaz", "tool": "2", "lat": "-77.1923", "lng": "91.0817" }
         ]
     },
@@ -1582,6 +1582,7 @@
             { "text": "random_item_24", "tool": "1", "lat": "-78.265625", "lng": "95.171875" },
             { "text": "random_item_30", "tool": "1", "lat": "-64.953125", "lng": "101.75" },
             { "text": "random_item_33", "tool": "1", "lat": "-73.96875", "lng": "110.828125" },
+            { "text": "random_item_43", "tool": "1", "lat": "-91.78125", "lng": "124.859375" },
             { "text": "random_item_49", "tool": "2", "lat": "-123", "lng": "13.3906" },
             { "text": "random_item_53", "tool": "2", "lat": "-123.2968", "lng": "21.9296" },
             { "text": "random_item_62", "tool": "2", "lat": "-115.0390", "lng": "29.0546" },
@@ -1645,7 +1646,6 @@
             { "text": "random_item_27", "tool": "1", "lat": "-85.28125", "lng": "72.5625" },
             { "text": "random_item_31", "tool": "1", "lat": "-55.3906", "lng": "103.4843" },
             { "text": "random_item_38", "tool": "1", "lat": "-68.921875", "lng": "142.078125" },
-            { "text": "random_item_43", "tool": "1", "lat": "-91.78125", "lng": "124.859375" },
             { "text": "random_item_46", "tool": "1", "lat": "-85.09375", "lng": "125.265625" },
             { "text": "random_item_52", "tool": "2", "lat": "-121.8203", "lng": "20.5" },
             { "text": "random_item_54", "tool": "2", "lat": "-116.3203", "lng": "22.7812" },
