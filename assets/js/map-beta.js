@@ -6,7 +6,10 @@ var Layers = {
   itemMarkersLayer: new L.LayerGroup(),
   miscLayer: new L.LayerGroup(),
   encountersLayer: new L.LayerGroup(),
-  oms: null
+  oms: null,
+
+  // Beta only
+  drawLayer: new L.LayerGroup(),
 };
 
 var MapBase = {
@@ -15,6 +18,10 @@ var MapBase = {
   map: null,
   overlays: [],
   markers: [],
+  geoJson: {},
+
+  // Beta only
+  drawnItems: null,
 
   init: function () {
     var mapLayers = [];
@@ -60,6 +67,32 @@ var MapBase = {
       setMapBackground(e.name);
     });
 
+    // Beta only.
+    MapBase.drawnItems = L.featureGroup().addTo(MapBase.map);
+
+    MapBase.map.addControl(new L.Control.Draw({
+      edit: {
+        featureGroup: MapBase.drawnItems,
+        poly: {
+          allowIntersection: false
+        }
+      },
+      draw: {
+        polygon: {
+          allowIntersection: false,
+          showArea: true
+        }
+      }
+    }));
+
+    MapBase.map.on(L.Draw.Event.CREATED, function (event) {
+      var layer = event.layer;
+      MapBase.drawnItems.addLayer(layer);
+    });
+
+    MapBase.loadGeoJson();
+
+    // End of beta only.
     var southWest = L.latLng(-160, -50),
       northEast = L.latLng(25, 250),
       bounds = L.latLngBounds(southWest, northEast);
@@ -75,12 +108,26 @@ var MapBase = {
   },
 
   loadOverlays: function () {
-    $.getJSON('data/overlays.json?nocache=' + nocache)
-      .done(function (data) {
-        MapBase.overlays = data;
-        MapBase.setOverlays();
+    // $.getJSON('data/overlays.json?nocache=' + nocache)
+    //   .done(function (data) {
+    //     MapBase.overlays = data;
+    //     MapBase.setOverlays();
 
-        console.log('overlays loaded');
+    //     console.log('overlays loaded');
+    //   });
+  },
+
+  loadGeoJson: function () {
+    $.getJSON('data/geojson/lemoyne.json?nocache=' + nocache)
+      .done(function (data) {
+        MapBase.geoJson.lemoyne = data;
+
+        L.geoJSON(MapBase.geoJson.lemoyne, {
+          style: {
+            "color": "#ff7800",
+            "weight": 5
+          }
+        }).addTo(MapBase.map);
       });
   },
 
@@ -132,7 +179,7 @@ var MapBase = {
 
     //if a marker is passed on url, check if is valid
     if (goTo = MapBase.markers.filter(_m => _m.text == getParameterByName('m') && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category])[0]) {
-      
+
       //set map view with marker lat & lng
       MapBase.map.setView([goTo.lat, goTo.lng], 6);
 
@@ -317,9 +364,12 @@ var MapBase = {
 
 
   updateMarkerContent: function (marker) {
-    var popupContent = '';
+    var popupContent = null;
 
-    if (marker.category != 'random') {
+    if (marker.category == 'random') {
+      popupContent = Language.get("random_item.desc");
+    }
+    else {
       var weeklyText = marker.weeklyCollection != null ? Language.get("weekly.desc").replace('{collection}', Language.get('weekly.desc.' + marker.weeklyCollection)) : '';
       popupContent = (marker.tool == '-1' ? Language.get('map.item.unable') : '') + ' ' + marker.description + ' ' + weeklyText;
     }
@@ -495,8 +545,8 @@ MapBase.submitDebugForm = function () {
       MapBase.debugMarker(parseFloat(arr[i]), parseFloat(arr[i + 1]), arr[i + 2]);
     }
   },
-//setClipboardText
-  MapBase.exportCustomMarkers = function () {   
+  //setClipboardText
+  MapBase.exportCustomMarkers = function () {
     setClipboardText("[" + debugMarkersArray + "]");
     alert('Markers copied to clipboard');
   },

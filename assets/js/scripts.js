@@ -20,13 +20,7 @@ var categoriesDisabledByDefault = [
 var enabledCategories = categories;
 var categoryButtons = document.getElementsByClassName("menu-option clickable");
 
-var toolType = '3'; //All type of tools
 var availableLanguages = ['ar-ar', 'de-de', 'en-us', 'es-es', 'fr-fr', 'hu-hu', 'it-it', 'ko', 'pt-br', 'pl', 'ru', 'th-th', 'zh-s', 'zh-t'];
-var lang;
-
-var nazarLocations = [];
-var nazarCurrentLocation;
-var nazarCurrentDate;
 
 var fastTravelData;
 
@@ -35,11 +29,10 @@ var date;
 
 var wikiLanguage = [];
 
-var debugTool = null;
-var isDebug = false;
-
 var inventory = [];
 var tempInventory = [];
+
+var debugMarkersArray = [];
 
 function init() {
 
@@ -84,12 +77,7 @@ function init() {
 
   });
 
-  if (typeof $.cookie('tools') !== 'undefined') {
-    $("#tools").val($.cookie('tools'));
-    toolType = $.cookie('tools');
-  }
-
-  if (typeof $.cookie('alert-closed') == 'undefined') {
+  if (typeof $.cookie('alert-closed-1') == 'undefined') {
     $('.map-alert').show();
   }
   else {
@@ -111,15 +99,10 @@ function init() {
   if (typeof $.cookie('map-layer') === 'undefined')
     $.cookie('map-layer', 'Detailed', { expires: 999 });
 
-  if (typeof $.cookie('language') === 'undefined') {
-    if (availableLanguages.includes(navigator.language.toLowerCase()))
-      $.cookie('language', navigator.language.toLowerCase(), { expires: 999 });
-    else
-      $.cookie('language', 'en-us', { expires: 999 });
-  }
 
-  if (!availableLanguages.includes($.cookie('language')))
-    $.cookie('language', 'en-us', { expires: 999 });
+  if (!availableLanguages.includes(Settings.language))
+    Settings.language = 'en-us';
+
 
   if (typeof $.cookie('remove-markers-daily') === 'undefined')
     $.cookie('remove-markers-daily', 'false', { expires: 999 });
@@ -145,9 +128,6 @@ function init() {
   }
   $.cookie('date', date, { expires: 7 });
 
-  lang = $.cookie('language');
-  $("#language").val(lang);
-
   Language.setMenuLanguage();
   MapBase.init();
 
@@ -156,8 +136,12 @@ function init() {
   if (Settings.isMenuOpened)
     $('.menu-toggle').click();
 
+
   $('#show-coordinates').val(Settings.isCoordsEnabled ? '1' : '0');
   $('#marker-cluster').val(Settings.markerCluster ? '1' : '0');
+  $('#tools').val(Settings.toolType);
+  $("#language").val(Settings.language);
+
   changeCursor();
 }
 
@@ -185,30 +169,9 @@ function changeCursor() {
   else
     $('.leaflet-grab').css('cursor', 'grab');
 }
-
-setInterval(function () {
-  var nextGMTMidnight = new Date();
-  nextGMTMidnight.setUTCHours(24);
-  nextGMTMidnight.setUTCMinutes(0);
-  nextGMTMidnight.setUTCSeconds(0);
-  var countdownDate = nextGMTMidnight - new Date();
-
-  var hours = Math.floor((countdownDate % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var minutes = Math.floor((countdownDate % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((countdownDate % (1000 * 60)) / 1000);
-
-  $('#countdown').text(addZeroToNumber(hours) + ':' + addZeroToNumber(minutes) + ':' + addZeroToNumber(seconds));
-
-  if (getVirtual(new Date()).getHours() >= 22 || getVirtual(new Date()).getHours() < 5)
-    $('#day-cycle').css('background', 'url(assets/images/moon.png)');
-  else
-    $('#day-cycle').css('background', 'url(assets/images/sun.png)');
-
-}, 1000);
-
 function addZeroToNumber(number) {
   if (number < 10)
-    number = '0' + number.toString();
+    number = '0' + number;
   return number;
 }
 
@@ -222,29 +185,19 @@ function getParameterByName(name, url) {
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-function copyMarkerLink(url) {
+//Copy text to clipboard
+function setClipboardText(text) {
   const el = document.createElement('textarea');
-  el.value = url;
+  el.value = text;
   document.body.appendChild(el);
   el.select();
   document.execCommand('copy');
   document.body.removeChild(el)
 }
-/**
- *  RDR2 Free roam timer
- *  Thanks to kanintesova
- **/
-var virtualOrigin = Date.parse("2019-08-15T06:00:00Z"),
-  realOrigin = Date.parse("2019-08-15T14:36:00Z"),
-  factor = 30;
 
-function getVirtual(time) {
-  var now = new Date(virtualOrigin + (time - realOrigin) * factor);
-  return new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-}
-
-// Clock in game created by Michal__d
 setInterval(function () {
+
+  // Clock in game created by Michal__d
   var display_24 = false,
     newDate = new Date(),
     startTime = newDate.valueOf(),
@@ -260,6 +213,18 @@ setInterval(function () {
     $('#time-in-game').text(addZeroToNumber(correctTime.getHours() % 12) + ":" + addZeroToNumber(correctTime.getMinutes()));
     $('#am-pm-time').text(((correctTime.getHours() > 12) ? "PM" : "AM"));
   }
+
+  //Countdown for the next cycle
+  var nextGMTMidnight = new Date();
+  var hours = 23 - nextGMTMidnight.getUTCHours();
+  var minutes = 59 - nextGMTMidnight.getUTCMinutes();
+  var seconds = 59 - nextGMTMidnight.getUTCSeconds();
+  $('#countdown').text(addZeroToNumber(hours) + ':' + addZeroToNumber(minutes) + ':' + addZeroToNumber(seconds));
+
+  if (correctTime.getHours() >= 22 || correctTime.getHours() < 5)
+    $('#day-cycle').css('background', 'url(assets/images/moon.png)');
+  else
+    $('#day-cycle').css('background', 'url(assets/images/sun.png)');
 }, 1000);
 
 // toggle timer and clock after click the container
@@ -308,8 +273,8 @@ $("#search").on("input", function () {
 
 //Change & save tool type
 $("#tools").on("change", function () {
-  toolType = $("#tools").val();
-  $.cookie('tools', toolType, { expires: 999 });
+  Settings.toolType = $("#tools").val();
+  $.cookie('tools', Settings.toolType, { expires: 999 });
   MapBase.addMarkers();
 });
 
@@ -372,7 +337,7 @@ $("#custom-routes").on("change", function () {
 
 //When map-alert is clicked
 $('.map-alert').on('click', function () {
-  $.cookie('alert-closed', 'true', { expires: 999 });
+  $.cookie('alert-closed-1', 'true', { expires: 999 });
   $('.map-alert').hide();
 });
 
@@ -386,8 +351,8 @@ $('#show-coordinates').on('change', function () {
 
 //Change & save language option
 $("#language").on("change", function () {
-  lang = $("#language").val();
-  $.cookie('language', lang, { expires: 999 });
+  Settings.language = $("#language").val();
+  $.cookie('language', Settings.language, { expires: 999 });
   Language.setMenuLanguage();
   MapBase.addMarkers();
   Menu.refreshMenu();
@@ -415,7 +380,7 @@ $('.menu-option.clickable').on('click', function () {
   }
   $.cookie('disabled-categories', categoriesDisabledByDefault.join(','), { expires: 999 });
 
-  if (menu.data('type') !== 'treasure') { 
+  if (menu.data('type') !== 'treasure') {
     MapBase.addMarkers();
   }
   else {
@@ -428,6 +393,7 @@ $('.menu-option.clickable').on('click', function () {
 $('.open-submenu').on('click', function (e) {
   e.stopPropagation();
   $(this).parent().parent().children('.menu-hidden').toggleClass('opened');
+  $(this).toggleClass('rotate');
 });
 
 //Sell collections on menu
@@ -484,7 +450,17 @@ $('#enable-inventory').on("change", function () {
   $.cookie('inventory-enabled', inputValue, { expires: 999 });
   Inventory.isEnabled = inputValue == 'true';
   MapBase.addMarkers();
+
+  if (Inventory.isEnabled)
+    $('.collection-sell, small.counter').show();
+  else
+    $('.collection-sell, small.counter').hide();
 });
+
+if (Inventory.isEnabled)
+  $('.collection-sell, small.counter').show();
+else
+  $('.collection-sell, small.counter').hide();
 
 //Enable & disable inventory on menu
 $('#inventory-stack').on("change", function () {
@@ -625,7 +601,7 @@ window.addEventListener("DOMContentLoaded", Cycles.load());
 window.addEventListener("DOMContentLoaded", Inventory.init());
 window.addEventListener("DOMContentLoaded", MapBase.loadWeeklySet());
 window.addEventListener("DOMContentLoaded", MapBase.loadFastTravels());
-window.addEventListener("DOMContentLoaded", MapBase.loadMadamNazar());
+window.addEventListener("DOMContentLoaded", MadamNazar.loadMadamNazar());
 window.addEventListener("DOMContentLoaded", Treasures.load());
 window.addEventListener("DOMContentLoaded", Encounters.load());
 window.addEventListener("DOMContentLoaded", MapBase.loadMarkers());
