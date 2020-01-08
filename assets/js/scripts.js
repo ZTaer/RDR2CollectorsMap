@@ -96,8 +96,8 @@ function init() {
     return categoriesDisabledByDefault.indexOf(item) === -1;
   });
 
-  if (typeof $.cookie('map-layer') === 'undefined')
-    $.cookie('map-layer', 'Detailed', { expires: 999 });
+  if (typeof $.cookie('map-layer') === 'undefined' || isNaN(parseInt($.cookie('map-layer'))))
+    $.cookie('map-layer', 1, { expires: 999 });
 
 
   if (!availableLanguages.includes(Settings.language))
@@ -121,15 +121,15 @@ function init() {
           inventory[value.text].isCollected = false;
 
         value.isCollected = false;
-        value.canCollect = value.amount < 10;
+        value.canCollect = value.amount < Inventory.stackSize;
       });
       MapBase.save();
     }
   }
   $.cookie('date', date, { expires: 7 });
 
-  Language.setMenuLanguage();
   MapBase.init();
+  Language.setMenuLanguage();
 
   setMapBackground($.cookie('map-layer'));
 
@@ -145,24 +145,25 @@ function init() {
   changeCursor();
 }
 
-function setMapBackground(mapName) {
-  switch (mapName) {
+function setMapBackground(mapIndex) {
+  switch (parseInt(mapIndex)) {
     default:
-    case 'Default':
+    case 0:
       $('#map').css('background-color', '#d2b790');
       break;
 
-    case 'Detailed':
+    case 1:
       $('#map').css('background-color', '#d2b790');
       break;
 
-    case 'Dark':
+    case 2:
       $('#map').css('background-color', '#3d3d3d');
       break;
   }
 
-  $.cookie('map-layer', mapName, { expires: 999 });
+  $.cookie('map-layer', mapIndex, { expires: 999 });
 }
+
 function changeCursor() {
   if (Settings.isCoordsEnabled || Routes.customRouteEnabled)
     $('.leaflet-grab').css('cursor', 'pointer');
@@ -252,6 +253,7 @@ $("#show-all-markers").on("change", function () {
 $('.menu-option.clickable input').on('click', function (e) {
   e.stopPropagation();
 });
+
 //change cycle by collection
 $('.menu-option.clickable input').on('change', function (e) {
   var el = $(e.target);
@@ -259,6 +261,7 @@ $('.menu-option.clickable input').on('change', function (e) {
   MapBase.addMarkers();
   Menu.refreshMenu();
 });
+
 //Search system on menu
 $("#search").on("input", function () {
   searchTerms = [];
@@ -286,7 +289,7 @@ $("#reset-markers").on("change", function () {
         inventory[value.text].isCollected = false;
 
       value.isCollected = false;
-      value.canCollect = value.amount < 10;
+      value.canCollect = value.amount < Inventory.stackSize;
     });
 
     MapBase.save();
@@ -356,6 +359,7 @@ $("#language").on("change", function () {
   Language.setMenuLanguage();
   MapBase.addMarkers();
   Menu.refreshMenu();
+  Cycles.setLocaleDate();
 });
 
 //Disable & enable collection category
@@ -414,10 +418,10 @@ $('.collection-sell').on('click', function (e) {
 
 //Remove item from map when using the menu
 $(document).on('click', '.collectible-wrapper', function () {
-  var collectible = $(this);
+  var collectible = $(this).data('type');
+  var category = $(this).parent().data('type');
 
-  MapBase.removeItemFromMap(collectible.data('type'), collectible.data('type'));
-
+  MapBase.removeItemFromMap(Cycles.data.cycles[Cycles.data.current][category], collectible, collectible, category);
 });
 
 //Open & close side menu
