@@ -142,6 +142,10 @@ function init() {
   $('#tools').val(Settings.toolType);
   $("#language").val(Settings.language);
 
+  $('#pins-place-mode').val(Settings.isPinsPlacingEnabled ? 'true' : 'false');
+  $('#pins-edit-mode').val(Settings.isPinsEditingEnabled ? 'true' : 'false');
+  Pins.loadAllPins();
+
   changeCursor();
 }
 
@@ -194,6 +198,20 @@ function setClipboardText(text) {
   el.select();
   document.execCommand('copy');
   document.body.removeChild(el)
+}
+
+// Simple download function
+function downloadAsFile(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
 }
 
 setInterval(function () {
@@ -447,7 +465,59 @@ $('#marker-cluster').on("change", function () {
   MapBase.map.removeLayer(Layers.itemMarkersLayer);
   MapBase.addMarkers();
 });
-//Inventory triggers
+
+
+/**
+ * User pins
+ */
+
+$('#pins-place-mode').on("change", function () {
+  var inputValue = $('#pins-place-mode').val();
+  inputValue = inputValue == 'true';
+  $.cookie('pins-place-enabled', inputValue, { expires: 999 });
+  Settings.isPinsPlacingEnabled = inputValue;
+});
+
+$('#pins-edit-mode').on("change", function () {
+  var inputValue = $('#pins-edit-mode').val();
+  inputValue = inputValue == 'true';
+  $.cookie('pins-edit-enabled', inputValue, { expires: 999 });
+  Settings.isPinsEditingEnabled = inputValue;
+
+  Pins.loadAllPins();
+});
+
+$('#pins-export').on("click", function () {
+  try {
+    Pins.exportPins();
+  } catch (error) {
+    console.error(error);
+    alert("This feature is not supported by your browser.");
+  }
+});
+
+$('#pins-import').on('click', function () {
+  try {
+    var file = $('#pins-import-file').prop('files')[0];
+
+    if (!file) {
+      alert("Please select a file in the field above the import button, then try again.");
+      return;
+    }
+
+    file.text().then(function (text) {
+      Pins.importPins(text);
+    })
+  } catch (error) {
+    console.error(error);
+    alert("This feature is not supported by your browser.");
+  }
+});
+
+/**
+ * Inventory
+ */
+
 //Enable & disable inventory on menu
 $('#enable-inventory').on("change", function () {
   var inputValue = $('#enable-inventory').val();
@@ -475,8 +545,69 @@ $('#inventory-stack').on("change", function () {
 });
 
 /**
+ * Cookie import/exporting
+ */
+
+$('#cookie-export').on("click", function () {
+  try {
+    var cookies = $.cookie();
+
+    // Google Analytics cookie isn't relevant.
+    delete cookies._ga;
+
+    var cookiesJson = JSON.stringify(cookies, null, 4);
+
+    downloadAsFile("collectible-map-settings.json", cookiesJson);
+  } catch (error) {
+    console.error(error);
+    alert("This feature is not supported by your browser.");
+  }
+});
+
+$('#cookie-import').on('click', function () {
+  try {
+    var file = $('#cookie-import-file').prop('files')[0];
+
+    if (!file) {
+      alert("Please select a file in the field above the import button, then try again.");
+      return;
+    }
+
+    file.text().then(function (res) {
+      var json = null;
+
+      try {
+        json = JSON.parse(res);
+      } catch (error) {
+        alert("The file you selected was not valid. Please select a different file.");
+        return;
+      }
+
+      // Remove all current cookies.
+      var currentCookies = $.cookie();
+
+      Object.keys(currentCookies).forEach(cookie => {
+        $.removeCookie(cookie);
+      });
+
+      // Import all the cookies from the file.
+      Object.keys(json).forEach(key => {
+        $.cookie(key, json[key], { expires: 999 });
+      });
+
+      // Do this for now, maybe look into refreshing the menu completely (from init) later.
+      location.reload();
+    })
+  } catch (error) {
+    console.error(error);
+    alert("This feature is not supported by your browser.");
+  }
+});
+
+/**
  * Path generator by Senexis
  */
+
 $('#generate-route-ignore-collected').on("change", function () {
   var inputValue = $('#generate-route-ignore-collected').val();
   inputValue = inputValue == 'true';
