@@ -19,7 +19,10 @@ var Routes = {
     $('#generate-route-start').val(genPathStart);
 
     if (genPathStart != "Custom") {
+      $('#generate-route-start-lat').parent().addClass('disabled');
       $('#generate-route-start-lat').prop('disabled', true);
+
+      $('#generate-route-start-lng').parent().addClass('disabled');
       $('#generate-route-start-lng').prop('disabled', true);
     }
   },
@@ -250,7 +253,11 @@ var Routes = {
 
     // Optionally ignore the already collected markers.
     if (Routes.ignoreCollected) {
-      newMarkers = newMarkers.filter((marker) => { return !marker.isCollected; });
+      newMarkers = newMarkers.filter((marker) => { return marker.canCollect && !marker.isCollected; });
+    }
+
+    if (Inventory.isEnabled) {
+      newMarkers = newMarkers.filter((marker) => { return marker.amount < Inventory.stackSize; });
     }
 
     var polylines = [];

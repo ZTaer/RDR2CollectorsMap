@@ -450,6 +450,8 @@ var MapBase = {
 
 MapBase.getToolIcon = function (type) {
   switch (type) {
+    case '-1':
+      return '<img class="tool-type" src="assets/images/cross.png">';
     default:
     case '0':
       return '';
@@ -484,7 +486,7 @@ MapBase.addFastTravelMarker = function () {
         })
       });
 
-      marker.bindPopup(`<h1>${Language.get(value.text + '.name')}</h1><p></p>`, { minWidth: 300 });
+      marker.bindPopup(`<h1>${Language.get(value.text + '.name')}</h1><p></p>`);
 
       Layers.itemMarkersLayer.addLayer(marker);
     });
