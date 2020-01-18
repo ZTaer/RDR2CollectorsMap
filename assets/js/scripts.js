@@ -149,6 +149,10 @@ function init() {
   changeCursor();
 }
 
+function isLocalHost() {
+   return location.hostname === "localhost" || location.hostname === "127.0.0.1";
+}
+
 function setMapBackground(mapIndex) {
   switch (parseInt(mapIndex)) {
     default:
@@ -750,6 +754,20 @@ $('#generate-route-start-lng').on("change", function () {
   inputValue = !isNaN(inputValue) ? inputValue : 8.0313;
   $.cookie('generator-path-start-lng', inputValue, { expires: 999 });
   Routes.startMarkerLng = inputValue;
+
+  Routes.generatePath();
+});
+
+$('#generate-route-use-pathfinder').on("change", function () {
+  Routes.usePathfinder = $("#generate-route-use-pathfinder").prop('checked');
+  $.cookie('generator-path-use-pathfinder', Routes.usePathfinder ? '1' : '0', { expires: 999 });
+
+  Routes.generatePath();
+});
+
+$('#generate-route-allow-fasttravel').on("change", function () {
+  Routes.allowFasttravel = $("#generate-route-allow-fasttravel").prop('checked');
+  $.cookie('generator-path-allow-fasttravel', Routes.allowFasttravel ? '1' : '0', { expires: 999 });
 
   Routes.generatePath();
 });
