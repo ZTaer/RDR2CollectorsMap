@@ -29,7 +29,7 @@ var MapBase = {
         noWrap: true,
         bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       }),
-      L.tileLayer((isLocalHost() ? 'assets/maps/' : 'https://jeanropke.b-cdn.net/') +'darkmode/{z}/{x}_{y}.jpg', {
+      L.tileLayer((isLocalHost() ? 'assets/maps/' : 'https://jeanropke.b-cdn.net/') + 'darkmode/{z}/{x}_{y}.jpg', {
         noWrap: true,
         bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       })
@@ -142,11 +142,34 @@ var MapBase = {
       $.each(_cycles, function (day, _markers) {
         $.each(_markers, function (key, marker) {
           MapBase.markers.push(new Marker(marker.text, marker.lat, marker.lng, marker.tool, day, _category, marker.subdata, marker.video, marker.loot_table));
-
         });
       });
     });
     uniqueSearchMarkers = MapBase.markers;
+
+    // Reset markers daily.
+    var curDate = new Date();
+    date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
+
+    if (date != $.cookie('date') && Settings.resetMarkersDaily) {
+      console.log('New day, resetting markers...');
+
+      var markers = MapBase.markers;
+
+      $.each(markers, function (key, value) {
+        if (inventory[value.text])
+          inventory[value.text].isCollected = false;
+
+        markers[key].isCollected = false;
+        markers[key].canCollect = value.amount < Inventory.stackSize;
+      });
+
+      MapBase.markers = markers;
+      MapBase.save();
+    }
+
+    $.cookie('date', date, { expires: 999 });
+
     MapBase.addMarkers(true);
 
     //if a marker is passed on url, check if is valid
@@ -378,10 +401,19 @@ var MapBase = {
       return weekly.item === (marker.text).replace(/_\d+/, "");
     }).length > 0;
 
+    var icon = '';
+    if (marker.subdata == 'agarita' || marker.subdata == 'blood_flower') {
+      icon = `./assets/images/icons/${marker.category}_timed_${MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)}.png`;
+    } else if (marker.category == 'random') {
+      icon = `./assets/images/icons/${marker.category}_lightgray_${marker.tool}.png`;
+    } else {
+      icon = `./assets/images/icons/${marker.category}_${MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)}.png`;
+    }
+
     var tempMarker = L.marker([marker.lat, marker.lng], {
       opacity: marker.canCollect ? 1 : .35,
       icon: new L.Icon.DataMarkup({
-        iconUrl: './assets/images/icons/' + marker.category + '_' + (marker.category == 'random' ? `lightgray_${marker.tool}` : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)) + '.png',
+        iconUrl: icon,
         iconSize: [35, 45],
         iconAnchor: [17, 42],
         popupAnchor: [1, -32],
@@ -454,7 +486,7 @@ var MapBase = {
   gameToMap: function (lat, lng, name = "Debug Marker") {
     MapBase.debugMarker((0.01552 * lng + -63.6), (0.01552 * lat + 111.29), name);
   },
-  game2Map: function ({x, y, z}) {
+  game2Map: function ({ x, y, z }) {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
   }
 };
