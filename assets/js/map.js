@@ -25,11 +25,11 @@ var MapBase = {
         noWrap: true,
         bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       }),
-      L.tileLayer((isLocalHost() ? 'assets/maps/' : 'https://jeanropke.b-cdn.net/') + 'detailed/{z}/{x}_{y}.jpg', {
+      L.tileLayer((isLocalHost() ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
         noWrap: true,
         bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       }),
-      L.tileLayer((isLocalHost() ? 'assets/maps/' : 'https://jeanropke.b-cdn.net/') + 'darkmode/{z}/{x}_{y}.jpg', {
+      L.tileLayer((isLocalHost() ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
         noWrap: true,
         bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       })
@@ -79,6 +79,12 @@ var MapBase = {
       MapBase.addCoordsOnMap(e);
     });
 
+    if (Settings.isDoubleClickZoomEnabled) {
+      MapBase.map.doubleClickZoom.enable();
+    } else {
+      MapBase.map.doubleClickZoom.disable();
+    }
+
     var southWest = L.latLng(-160, -50),
       northEast = L.latLng(25, 250),
       bounds = L.latLngBounds(southWest, northEast);
@@ -98,8 +104,7 @@ var MapBase = {
       .done(function (data) {
         MapBase.overlays = data;
         MapBase.setOverlays();
-
-        console.log('overlays loaded');
+        console.info('%c[Overlays] Loaded!', 'color: #bada55; background: #242424');
       });
   },
 
@@ -236,11 +241,11 @@ var MapBase = {
     Layers.pinsLayer.addTo(MapBase.map);
 
     MapBase.addFastTravelMarker();
-    MadamNazar.addMadamNazar(refreshMenu);
 
     Menu.refreshItemsCounter();
     Treasures.addToMap();
     Encounters.addToMap();
+    MadamNazar.addMadamNazar();
 
     if (refreshMenu)
       Menu.refreshMenu();
@@ -258,7 +263,7 @@ var MapBase = {
       .done(function (data) {
         weeklySetData = data;
       });
-    console.log('weekly sets loaded');
+    console.info('%c[Weekly Sets] Loaded!', 'color: #bada55; background: #242424');
   },
 
   removeItemFromMap: function (day, text, subdata, category, skipInventory = false) {
@@ -322,6 +327,24 @@ var MapBase = {
     Menu.refreshItemsCounter();
   },
 
+  /*removeCategoryFromMap: function (category) {
+    var _markers = MapBase.markers.filter(function (marker) {
+      return marker.category == category;
+    });
+    $.each(_markers, function (key, marker) {
+      if (Layers.itemMarkersLayer.getLayerById(marker.text) != null &&
+        marker.day == Cycles.data.cycles[Cycles.data.current][marker.category]) {
+        if (!categoriesDisabledByDefault.includes(category)) {
+          MapBase.addMarkerOnMap(marker);
+          console.log('addMarkerOnMap');
+        }
+        else
+          MapBase.map.removeLayer(Layers.itemMarkersLayer.getLayerById(marker.text));
+        console.log('removeLayer');
+      }
+    });
+  },*/
+
   getIconColor: function (value) {
     switch (value) {
       case "day_1":
@@ -367,7 +390,9 @@ var MapBase = {
     var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://jeanropke.github.io/RDR2CollectorsMap/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
     var lootText = marker.category == 'random' ? ` | <a href="javascript:void(0)" data-toggle="modal" data-target="#detailed-loot-modal" data-table="${marker.lootTable || 'unknown'}">${Language.get('menu.loot_table.view_loot')}</a>` : '';
     var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">' + Language.get('map.video') + '</a>' : '';
-    var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(lootText).append(videoText);
+    var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}')">${Language.get('map.mark_important')}</a>` : '' );
+
+    var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(lootText).append(videoText).append(importantItem);
 
     var buttons = marker.category == 'random' ? '' : `<div class="marker-popup-buttons">
     <button class="btn btn-danger" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', -1)">↓</button>
@@ -450,11 +475,17 @@ var MapBase = {
     else
       marker.description = Language.get(`${marker.text}_${marker.day}.desc`);
 
-    tempMarker.bindPopup(MapBase.updateMarkerContent(marker), { minWidth: 300, maxWidth: 400 })
-      .on("click", function (e) {
-        Routes.addMarkerOnCustomRoute(marker.text);
-        if (Routes.customRouteEnabled) e.target.closePopup();
-      });
+    if (Settings.isPopupsEnabled) {
+      tempMarker.bindPopup(MapBase.updateMarkerContent(marker), { minWidth: 300, maxWidth: 400 });
+    }
+
+    tempMarker.on("click", function (e) {
+      if (!Settings.isPopupsEnabled) MapBase.removeItemFromMap(marker.day || '', marker.text || '', marker.subdata || '', marker.category || '');
+
+      Routes.addMarkerOnCustomRoute(marker.text);
+      if (Routes.customRouteEnabled) e.target.closePopup();
+    });
+
     Layers.itemMarkersLayer.addLayer(tempMarker);
     if (Settings.markerCluster)
       Layers.oms.addMarker(tempMarker);
@@ -481,13 +512,16 @@ var MapBase = {
         expires: 999
       });
     });
-    console.log('saved');
   },
   gameToMap: function (lat, lng, name = "Debug Marker") {
     MapBase.debugMarker((0.01552 * lng + -63.6), (0.01552 * lat + 111.29), name);
   },
   game2Map: function ({ x, y, z }) {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
+  },
+
+  highlightImportantItem (text) {
+    $(`[data-marker*=${text}]`).toggleClass('highlightItems');
   }
 };
 
@@ -510,8 +544,7 @@ MapBase.loadFastTravels = function () {
     .done(function (data) {
       fastTravelData = data;
     });
-
-  console.log('fast travels loaded');
+  console.info('%c[Fast travels] Loaded!', 'color: #bada55; background: #242424');
 };
 
 MapBase.addFastTravelMarker = function () {
@@ -594,32 +627,31 @@ MapBase.formatDate = function (date) {
  */
 var MadamNazar = {
 
-  possibleLocations: [],
+  possibleLocations: [{ "x": "-40.5625", "y": "109.078125" }, { "x": "-43", "y": "132.828125" }, { "x": "-36.75", "y": "153.6875" }, { "x": "-56.171875", "y": "78.59375" }, { "x": "-63.6640625", "y": "105.671875" }, { "x": "-60.421875", "y": "130.640625" }, { "x": "-66.046875", "y": "151.03125" }, { "x": "-84.4375", "y": "82.03125" }, { "x": "-90.53125", "y": "135.65625" }, { "x": "-100.140625", "y": "48.8125" }, { "x": "-105.0703125", "y": "84.9765625" }, { "x": "-124.03125", "y": "34.171875" }],
   currentLocation: null,
   currentDate: null,
 
   loadMadamNazar: function () {
-    $.getJSON('https://pepegapi.jeanropke.net/rdo/nazar')
-      .done(function (nazar) {
-        MadamNazar.currentLocation = nazar.nazar_id - 1;
-        MadamNazar.currentDate = nazar.date;
-      }).always(function () {
-        $.getJSON('data/nazar.json?nocache=' + nocache)
-          .done(function (data) {
-            MadamNazar.possibleLocations = data;
-            MadamNazar.addMadamNazar(false);
-          });
-      });
+
+    var _nazarParam = getParameterByName('nazar');
+    if (_nazarParam < MadamNazar.possibleLocations.length && _nazarParam) {
+      MadamNazar.currentLocation = _nazarParam;
+      MadamNazar.currentDate = '';
+      MadamNazar.addMadamNazar();
+    } else {
+      $.getJSON('https://pepegapi.jeanropke.net/rdo/nazar')
+        .done(function (nazar) {
+          MadamNazar.currentLocation = nazar.nazar_id - 1;
+          MadamNazar.currentDate = MapBase.formatDate(nazar.date);
+          MadamNazar.addMadamNazar();
+        });
+    }
   },
 
-  addMadamNazar: function (firstLoad) {
-    if (firstLoad)
+  addMadamNazar: function () {
+    if (MadamNazar.currentLocation == null)
       return;
 
-    if (MadamNazar.currentLocation == null) {
-      console.error('Unable to get Nazar position. Try again later.');
-      return;
-    }
     if (enabledCategories.includes('nazar')) {
       var marker = L.marker([MadamNazar.possibleLocations[MadamNazar.currentLocation].x, MadamNazar.possibleLocations[MadamNazar.currentLocation].y], {
         icon: L.icon({
@@ -631,8 +663,7 @@ var MadamNazar = {
           shadowUrl: './assets/images/markers-shadow.png'
         })
       });
-
-      marker.bindPopup(`<h1>${Language.get('menu.madam_nazar')} - ${MapBase.formatDate(MadamNazar.currentDate)}</h1><p style="text-align: center;">${Language.get('map.madam_nazar.desc').replace('{link}', '<a href="https://twitter.com/MadamNazarIO" target="_blank">@MadamNazarIO</a>')}</p>`, { minWidth: 300 });
+      marker.bindPopup(`<h1>${Language.get('menu.madam_nazar')} - ${MadamNazar.currentDate}</h1><p style="text-align: center;">${Language.get('map.madam_nazar.desc').replace('{link}', '<a href="https://twitter.com/MadamNazarIO" target="_blank">@MadamNazarIO</a>')}</p>`, { minWidth: 300 });
       Layers.itemMarkersLayer.addLayer(marker);
     }
   }
