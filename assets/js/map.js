@@ -7,6 +7,7 @@ var Layers = {
   miscLayer: new L.LayerGroup(),
   encountersLayer: new L.LayerGroup(),
   pinsLayer: new L.LayerGroup(),
+  overlaysLayer: new L.LayerGroup(),
   oms: null
 };
 
@@ -103,15 +104,21 @@ var MapBase = {
     $.getJSON('data/overlays.json?nocache=' + nocache)
       .done(function (data) {
         MapBase.overlays = data;
-        MapBase.setOverlays();
+        MapBase.setOverlays(Settings.overlayOpacity);
         console.info('%c[Overlays] Loaded!', 'color: #bada55; background: #242424');
       });
   },
 
-  setOverlays: function () {
+  setOverlays: function (opacity = 0.5) {
+    Layers.overlaysLayer.clearLayers();
+
+    if (opacity == 0) return;
+    
     $.each(MapBase.overlays, function (key, value) {
-      L.imageOverlay(value.img, value.bounds).addTo(MapBase.map);
+      Layers.overlaysLayer.addLayer(L.imageOverlay(value.img, value.bounds, { opacity: opacity }));
     });
+
+    Layers.overlaysLayer.addTo(MapBase.map);
   },
 
   devGameToMap: function (t) {
@@ -220,11 +227,12 @@ var MapBase = {
   },
 
   addMarkers: function (refreshMenu = false) {
-
     if (Layers.itemMarkersLayer != null)
       Layers.itemMarkersLayer.clearLayers();
     if (Layers.miscLayer != null)
       Layers.miscLayer.clearLayers();
+
+    var opacity = Settings.markerOpacity;
 
     $.each(MapBase.markers, function (key, marker) {
       //Set isVisible to false. addMarkerOnMap will set to true if needs
@@ -234,7 +242,7 @@ var MapBase = {
         if (categoriesDisabledByDefault.includes(marker.subdata))
           return;
 
-      MapBase.addMarkerOnMap(marker);
+      MapBase.addMarkerOnMap(marker, opacity);
     });
 
     Layers.itemMarkersLayer.addTo(MapBase.map);
@@ -262,6 +270,13 @@ var MapBase = {
     $.getJSON('data/weekly.json?nocache=' + nocache)
       .done(function (data) {
         weeklySetData = data;
+
+        var _weekly = getParameterByName('weekly');
+        if (_weekly != null) {
+          if (weeklySetData.sets[_weekly]) {
+            weeklySetData.current = _weekly;
+          }
+        }
       });
     console.info('%c[Weekly Sets] Loaded!', 'color: #bada55; background: #242424');
   },
@@ -390,7 +405,7 @@ var MapBase = {
     var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://jeanropke.github.io/RDR2CollectorsMap/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
     var lootText = marker.category == 'random' ? ` | <a href="javascript:void(0)" data-toggle="modal" data-target="#detailed-loot-modal" data-table="${marker.lootTable || 'unknown'}">${Language.get('menu.loot_table.view_loot')}</a>` : '';
     var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">' + Language.get('map.video') + '</a>' : '';
-    var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}')">${Language.get('map.mark_important')}</a>` : '' );
+    var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}')">${Language.get('map.mark_important')}</a>` : '');
 
     var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(lootText).append(videoText).append(importantItem);
 
@@ -412,7 +427,7 @@ var MapBase = {
         `;
   },
 
-  addMarkerOnMap: function (marker) {
+  addMarkerOnMap: function (marker, opacity = 1) {
     if (marker.day != Cycles.data.cycles[Cycles.data.current][marker.category] && !Settings.showAllMarkers) return;
 
     if (!uniqueSearchMarkers.includes(marker))
@@ -436,7 +451,7 @@ var MapBase = {
     }
 
     var tempMarker = L.marker([marker.lat, marker.lng], {
-      opacity: marker.canCollect ? 1 : .35,
+      opacity: marker.canCollect ? opacity : opacity / 3,
       icon: new L.Icon.DataMarkup({
         iconUrl: icon,
         iconSize: [35, 45],
@@ -520,7 +535,7 @@ var MapBase = {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
   },
 
-  highlightImportantItem (text) {
+  highlightImportantItem(text) {
     $(`[data-marker*=${text}]`).toggleClass('highlightItems');
   }
 };
