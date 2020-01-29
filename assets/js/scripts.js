@@ -9,12 +9,12 @@ var categories = [
   'american_flowers', 'antique_bottles', 'arrowhead', 'bird_eggs', 'coin', 'family_heirlooms', 'lost_bracelet',
   'lost_earrings', 'lost_necklaces', 'lost_ring', 'card_cups', 'card_pentacles', 'card_swords', 'card_wands', 'nazar',
   'fast_travel', 'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'fame_seeker', 'user_pins'
+  'wounded_animal', 'fame_seeker', 'moonshiner_camp', 'user_pins'
 ];
 
 var categoriesDisabledByDefault = [
   'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'fame_seeker'
+  'wounded_animal', 'fame_seeker', 'moonshiner_camp'
 ]
 
 var enabledCategories = categories;
@@ -33,12 +33,10 @@ var debugMarkersArray = [];
 var tempCollectedMarkers = "";
 
 function init() {
-
   wikiLanguage['de-de'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Sammler-Landkarte-Benutzerhandbuch-(Deutsch)';
   wikiLanguage['en-us'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Collectors-Map-User-Guide-(English)';
   wikiLanguage['fr-fr'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Collectors-Map-Guide-d\'Utilisateur-(French)';
   wikiLanguage['pt-br'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/Guia-do-Usu%C3%A1rio---Mapa-de-Colecionador-(Portuguese)';
-
 
   //sometimes, cookies are saved in the wrong order
   var cookiesList = [];
@@ -105,6 +103,11 @@ function init() {
     $.cookie('enable-marker-popups', '1', { expires: 999 });
   }
 
+  if (typeof $.cookie('enable-marker-shadows') === 'undefined') {
+    Settings.isShadowsEnabled = true;
+    $.cookie('enable-marker-shadows', '1', { expires: 999 });
+  }
+
   if (typeof $.cookie('enable-dclick-zoom') === 'undefined') {
     Settings.isDoubleClickZoomEnabled = true;
     $.cookie('enable-dclick-zoom', '1', { expires: 999 });
@@ -143,12 +146,14 @@ function init() {
   $('#reset-markers').prop("checked", Settings.resetMarkersDaily);
   $('#marker-cluster').prop("checked", Settings.markerCluster);
   $('#enable-marker-popups').prop("checked", Settings.isPopupsEnabled);
+  $('#enable-marker-shadows').prop("checked", Settings.isShadowsEnabled);
   $('#enable-dclick-zoom').prop("checked", Settings.isDoubleClickZoomEnabled);
   $('#pins-place-mode').prop("checked", Settings.isPinsPlacingEnabled);
   $('#pins-edit-mode').prop("checked", Settings.isPinsEditingEnabled);
   $('#show-help').prop("checked", Settings.showHelp);
   $('#show-coordinates').prop("checked", Settings.isCoordsEnabled);
   $('#sort-items-alphabetically').prop("checked", Settings.sortItemsAlphabetically);
+  $("#enable-right-click").prop('checked', $.cookie('right-click') != null);
 
   if (Settings.showHelp) {
     $("#help-container").show();
@@ -286,6 +291,15 @@ $("#toggle-debug").on("click", function () {
 $("#show-all-markers").on("change", function () {
   Settings.showAllMarkers = $("#show-all-markers").prop('checked');
   MapBase.addMarkers();
+});
+
+// Give me back my right-click
+$('#enable-right-click').on("change", function () {
+  if ($("#enable-right-click").prop('checked')) {
+    $.cookie('right-click', '1', { expires: 999 });
+  } else {
+    $.removeCookie('right-click');
+  }
 });
 
 //Disable menu category when click on input
@@ -543,6 +557,14 @@ $('#marker-cluster').on("change", function () {
 $('#enable-marker-popups').on("change", function () {
   Settings.isPopupsEnabled = $("#enable-marker-popups").prop('checked');
   $.cookie('enable-marker-popups', Settings.isPopupsEnabled ? '1' : '0', { expires: 999 });
+
+  MapBase.map.removeLayer(Layers.itemMarkersLayer);
+  MapBase.addMarkers();
+});
+
+$('#enable-marker-shadows').on("change", function () {
+  Settings.isShadowsEnabled = $("#enable-marker-shadows").prop('checked');
+  $.cookie('enable-marker-shadows', Settings.isShadowsEnabled ? '1' : '0', { expires: 999 });
 
   MapBase.map.removeLayer(Layers.itemMarkersLayer);
   MapBase.addMarkers();
@@ -911,20 +933,24 @@ L.LayerGroup.include({
 
 // Disable annoying menu on right mouse click
 $('*').on('contextmenu', function (event) {
-  if($.cookie('right-click') == null)
-    event.preventDefault();
+  if ($.cookie('right-click') != null)
+    return;
+  event.preventDefault();
 });
 
 /**
  * Event listeners
  */
-window.addEventListener("DOMContentLoaded", init);
-window.addEventListener("DOMContentLoaded", Cycles.load());
-window.addEventListener("DOMContentLoaded", Inventory.init());
-window.addEventListener("DOMContentLoaded", MapBase.loadWeeklySet());
-window.addEventListener("DOMContentLoaded", MapBase.loadFastTravels());
-window.addEventListener("DOMContentLoaded", MadamNazar.loadMadamNazar());
-window.addEventListener("DOMContentLoaded", Treasures.load());
-window.addEventListener("DOMContentLoaded", Encounters.load());
-window.addEventListener("DOMContentLoaded", MapBase.loadMarkers());
-window.addEventListener("DOMContentLoaded", Routes.init());
+
+$(function () {
+  init();
+  Cycles.load();
+  Inventory.init();
+  MapBase.loadWeeklySet();
+  MapBase.loadFastTravels();
+  MadamNazar.loadMadamNazar();
+  Treasures.load();
+  Encounters.load();
+  MapBase.loadMarkers();
+  Routes.init();
+});
