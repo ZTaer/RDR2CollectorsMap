@@ -9,12 +9,12 @@ var categories = [
   'american_flowers', 'antique_bottles', 'arrowhead', 'bird_eggs', 'coin', 'family_heirlooms', 'lost_bracelet',
   'lost_earrings', 'lost_necklaces', 'lost_ring', 'card_cups', 'card_pentacles', 'card_swords', 'card_wands', 'nazar',
   'fast_travel', 'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'moonshiner_camp', 'user_pins'
+  'wounded_animal', 'moonshiner_camp', 'rival_collector', 'user_pins'
 ];
 
 var categoriesDisabledByDefault = [
   'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'moonshiner_camp'
+  'wounded_animal', 'moonshiner_camp', 'rival_collector'
 ]
 
 var enabledCategories = categories;
@@ -870,10 +870,12 @@ $('#generate-route-use-pathfinder').on("change", function () {
     $('#generate-route-distance').parent().hide();
     $('#generate-route-auto-update').parent().parent().hide();
     $('#generate-route-allow-fasttravel').parent().parent().show();
+    $('#generate-route-allow-railroad').parent().parent().show();
   } else {
     $('#generate-route-distance').parent().show();
     $('#generate-route-auto-update').parent().parent().show();
     $('#generate-route-allow-fasttravel').parent().parent().hide();
+    $('#generate-route-allow-railroad').parent().parent().hide();
   }
 
   // Prevent both routes being stuck on screen.
@@ -885,6 +887,13 @@ $('#generate-route-use-pathfinder').on("change", function () {
 $('#generate-route-allow-fasttravel').on("change", function () {
   Routes.allowFasttravel = $("#generate-route-allow-fasttravel").prop('checked');
   $.cookie('generator-path-allow-fasttravel', Routes.allowFasttravel ? '1' : '0', { expires: 999 });
+
+  Routes.generatePath();
+});
+
+$('#generate-route-allow-railroad').on("change", function () {
+  Routes.allowRailroad = $("#generate-route-allow-railroad").prop('checked');
+  $.cookie('generator-path-allow-railroad', Routes.allowRailroad ? '1' : '0', { expires: 999 });
 
   Routes.generatePath();
 });
