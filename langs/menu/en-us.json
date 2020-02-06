@@ -91,7 +91,7 @@
 	{"key": "menu.generate_route_fasttravel_weight", "value": "Fast travel preference"},
 	{"key": "menu.generate_route_railroad_weight", "value": "Railroads preference"},
 	{"key": "menu.generate_route_weight.Infinity", "value": "Don't use"},
-	{"key": "menu.generate_route_weight.2", "value": "Only when neccesary"},
+	{"key": "menu.generate_route_weight.2", "value": "Only when necessary"},
 	{"key": "menu.generate_route_weight.1.5", "value": "Very long distances"},
 	{"key": "menu.generate_route_weight.1.1", "value": "Long distances"},
 	{"key": "menu.generate_route_weight.1", "value": "Same as roads"},
@@ -201,6 +201,11 @@
 	{"key": "menu.sort_items_alphabetically", "value": "Sort items alphabetically"},
 	{"key": "menu.enable_marker_shadows", "value": "Marker shadows enabled"},
 	{"key": "map.refresh_for_updates_alert", "value": "Today's cycles haven't been updated yet. Please refresh to check for updates."},
+	{"key": "map.unknown_cycle_description", "value": "This item is in unknown cycle, if you find something here, report it on: {GitHub} or {Discord}."},
+	{"key": "map.unknown_cycle", "value": "unknown"},
+	{"key": "menu.delete_all_settings", "value": "Reset all settings"},
+	{"key": "menu.modal_delete_all_settings_title", "value": "Reset all settings?"},
+	{"key": "menu.modal_delete_all_settings_body", "value": "This will reset all settings, pins, and inventory items to their default values and reload the page."},
 
 	{"key": "help.default", "value": "Hover over or long-press (mobile) any setting to get information about it."},
 	{"key": "help.clear_custom_routes", "value": "Clears all the custom routes currently on the map."},
@@ -267,5 +272,6 @@
 	{"key": "help.item_category_unavailable_items", "value": "Toggles whether this set should be visible on the map. Note that this set contains one or more items that are unavailable due to a game bug or being undiscovered."},
 	{"key": "help.search_copy_link", "value": "Copies the current search link to your clipboard so you can browse to the map with that search query."},
 	{"key": "help.sort_items_alphabetically", "value": "Whether items should be sorted alphabetically or using the in-game order."},
-	{"key": "help.enable_marker_shadows", "value": "Toggles whether a marker should have a shadow or not. Disabling the shadows could improve performance somewhat."}
+	{"key": "help.enable_marker_shadows", "value": "Toggles whether a marker should have a shadow or not. Disabling the shadows could improve performance somewhat."},
+	{"key": "help.delete_all_settings", "value": "Resets all settings, user pins, and inventory items to their default values."}
 ]
