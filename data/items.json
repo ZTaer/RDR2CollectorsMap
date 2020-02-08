@@ -25,7 +25,7 @@
             { "text": "arrowhead_raw", "height": "0", "tool": "1", "lat": "-86.9239", "lng": "69.5697", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=795s" },
             { "text": "arrowhead_obsidian", "height": "0", "tool": "2", "lat": "-56.3809", "lng": "129.0077", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=830s" },
             { "text": "arrowhead_quartz", "height": "0", "tool": "2", "lat": "-28.6270", "lng": "155.4751", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=868s" },
-            { "text": "arrowhead_flint", "height": "0", "tool": "1", "lat": "-36.9540", "lng": "116.3335", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=905s" },
+            { "text": "arrowhead_flint", "height": "-1", "tool": "1", "lat": "-36.9540", "lng": "116.3335", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=905s" },
             { "text": "arrowhead_agate", "height": "0", "tool": "2", "lat": "-85.9495", "lng": "86.0545", "video": "https://www.youtube.com/watch?v=EJYsStXzjX0&t=961s" }
         ],
         "3": [
@@ -1429,7 +1429,7 @@
             { "text": "flower_wild_rhubarb_3", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-110.3560", "lng": "38.8723" },
             { "text": "flower_wild_rhubarb_4", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-107.6969", "lng": "63.6471" },
             { "text": "flower_wild_rhubarb_5", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-105.8152", "lng": "52.0114" },
-            { "text": "flower_wild_rhubarb_6", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-92.1225", "lng": "143.1658" },
+            { "text": "flower_wild_rhubarb_6", "subdata": "wild_rhubarb", "height": "0", "tool": "-1", "lat": "-92.1225", "lng": "143.1658" },
             { "text": "flower_wild_rhubarb_7", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-105.3398", "lng": "55.5376" },
             { "text": "flower_wild_rhubarb_8", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-105.1634", "lng": "60.5706" },
             { "text": "flower_wild_rhubarb_9", "subdata": "wild_rhubarb", "height": "0", "tool": "0", "lat": "-103.6266", "lng": "69.6797" },
