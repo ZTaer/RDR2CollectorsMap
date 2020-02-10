@@ -9,12 +9,12 @@ var categories = [
   'american_flowers', 'antique_bottles', 'arrowhead', 'bird_eggs', 'coin', 'family_heirlooms', 'lost_bracelet',
   'lost_earrings', 'lost_necklaces', 'lost_ring', 'card_cups', 'card_pentacles', 'card_swords', 'card_wands', 'nazar',
   'fast_travel', 'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'moonshiner_camp', 'rival_collector', 'user_pins'
+  'wounded_animal', 'rival_collector', 'user_pins'
 ];
 
 var categoriesDisabledByDefault = [
   'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
-  'wounded_animal', 'moonshiner_camp', 'rival_collector'
+  'wounded_animal', 'rival_collector'
 ]
 
 var enabledCategories = categories;
@@ -151,6 +151,7 @@ function init() {
   $('#reset-markers').prop("checked", Settings.resetMarkersDaily);
   $('#marker-cluster').prop("checked", Settings.markerCluster);
   $('#enable-marker-popups').prop("checked", Settings.isPopupsEnabled);
+  $('#enable-marker-popups-hover').prop("checked", Settings.isPopupsHoverEnabled);
   $('#enable-marker-shadows').prop("checked", Settings.isShadowsEnabled);
   $('#enable-dclick-zoom').prop("checked", Settings.isDoubleClickZoomEnabled);
   $('#pins-place-mode').prop("checked", Settings.isPinsPlacingEnabled);
@@ -590,6 +591,11 @@ $('#enable-marker-popups').on("change", function () {
 
   MapBase.map.removeLayer(Layers.itemMarkersLayer);
   MapBase.addMarkers();
+});
+
+$('#enable-marker-popups-hover').on("change", function () {
+  Settings.isPopupsHoverEnabled = $("#enable-marker-popups-hover").prop('checked');
+  $.cookie('enable-marker-popups-hover', Settings.isPopupsHoverEnabled ? '1' : '0', { expires: 999 });
 });
 
 $('#enable-marker-shadows').on("change", function () {

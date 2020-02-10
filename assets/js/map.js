@@ -32,6 +32,54 @@ var MapBase = {
       })
     ];
 
+    // Override bindPopup to include mouseover and mouseout logic.
+    L.Layer.include({
+      bindPopup: function (content, options) {
+        // TODO: Check if we can move this from here.
+        if (content instanceof L.Popup) {
+          Util.setOptions(content, options);
+          this._popup = content;
+          content._source = this;
+        } else {
+          if (!this._popup || options) {
+            this._popup = new L.Popup(options, this);
+          }
+          this._popup.setContent(content);
+        }
+
+        if (!this._popupHandlersAdded) {
+          this.on({
+            click: this._openPopup,
+            keypress: this._onKeyPress,
+            remove: this.closePopup,
+            move: this._movePopup
+          });
+          this._popupHandlersAdded = true;
+        }
+
+        this.on('mouseover', function (e) {
+          if (!Settings.isPopupsHoverEnabled) return;
+          this.openPopup();
+        });
+
+        this.on('mouseout', function (e) {
+          if (!Settings.isPopupsHoverEnabled) return;
+
+          var that = this;
+          var timeout = setTimeout(function () {
+            that.closePopup();
+          }, 100);
+
+          $('.leaflet-popup').on('mouseover', function (e) {
+            clearTimeout(timeout);
+            $('.leaflet-popup').off('mouseover');
+          });
+        });
+
+        return this;
+      }
+    });
+
     MapBase.map = L.map('map', {
       preferCanvas: true,
       attributionControl: false,
@@ -434,6 +482,7 @@ var MapBase = {
     <button class="btn btn-success" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', 1)">↑</button>
     </div>`;
 
+
     return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Settings.cycleForUnknownCycles ? marker.day : Language.get('map.unknown_cycle'))}</h1>
         ${warningText}
         <span class="marker-content-wrapper">
@@ -495,7 +544,7 @@ var MapBase = {
       icon: new L.DivIcon.DataMarkup({
         iconSize: [35, 45],
         iconAnchor: [17, 42],
-        popupAnchor: [1, -32],
+        popupAnchor: [0, -28],
         shadowAnchor: [10, 12],
         html: `
           ${overlay}
@@ -612,7 +661,7 @@ var MapBase = {
           icon: L.divIcon({
             iconSize: [35, 45],
             iconAnchor: [17, 42],
-            popupAnchor: [1, -32],
+            popupAnchor: [0, -28],
             shadowAnchor: [10, 12],
             html: `
               <img class="icon" src="./assets/images/icons/fast_travel.png" alt="Icon">
@@ -642,7 +691,7 @@ var MapBase = {
       icon: L.divIcon({
         iconSize: [35, 45],
         iconAnchor: [17, 42],
-        popupAnchor: [1, -32],
+        popupAnchor: [0, -28],
         shadowAnchor: [10, 12],
         html: `
           <img class="icon" src="./assets/images/icons/random.png" alt="Icon">
