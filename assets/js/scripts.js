@@ -123,6 +123,11 @@ function init() {
     $.cookie('marker-opacity', '1', { expires: 999 });
   }
 
+  if (typeof $.cookie('marker-size') === 'undefined') {
+    Settings.markerSize = 1;
+    $.cookie('marker-size', '1', { expires: 999 });
+  }
+
   if (typeof $.cookie('overlay-opacity') === 'undefined') {
     Settings.overlayOpacity = 0.5;
     $.cookie('overlay-opacity', '0.5', { expires: 999 });
@@ -146,6 +151,7 @@ function init() {
   $('#tools').val(Settings.toolType);
   $('#language').val(Settings.language);
   $('#marker-opacity').val(Settings.markerOpacity);
+  $('#marker-size').val(Settings.markerSize);
   $('#overlay-opacity').val(Settings.overlayOpacity);
 
   $('#reset-markers').prop("checked", Settings.resetMarkersDaily);
@@ -169,12 +175,18 @@ function init() {
   }
 
   if (Settings.displayClockHideTimer) {
-    $('.clock-container').removeClass('turn-off');
-    $('.timer-container').addClass('turn-off');
+    $('.clock-container').removeClass('hidden');
+    $('.timer-container').addClass('hidden');
   }
   else {
-    $('.clock-container').addClass('turn-off');
-    $('.timer-container').removeClass('turn-off');
+    $('.clock-container').addClass('hidden');
+    $('.timer-container').removeClass('hidden');
+  }
+
+  if (Settings.isDebugEnabled) {
+    $('#cycle-changer-container').removeClass('hidden');
+  } else {
+    $('#cycle-changer-container').addClass('hidden');
   }
 
   Pins.addToMap();
@@ -293,7 +305,7 @@ setInterval(function () {
 
 // toggle timer and clock after click the container
 $('.timer-container, .clock-container').on('click', function () {
-  $('.timer-container, .clock-container').toggleClass('turn-off');
+  $('.timer-container, .clock-container').toggleClass('hidden');
   Settings.displayClockHideTimer = !Settings.displayClockHideTimer;
   $.cookie('clock-or-timer', Settings.displayClockHideTimer, { expires: 999 });
 });
@@ -327,9 +339,13 @@ $('#enable-debug').on("change", function () {
   if ($("#enable-debug").prop('checked')) {
     Settings.isDebugEnabled = true;
     $.cookie('debug', '1', { expires: 999 });
+
+    $('#cycle-changer-container').removeClass('hidden');
   } else {
     Settings.isDebugEnabled = false;
     $.removeCookie('debug');
+
+    $('#cycle-changer-container').addClass('hidden');
   }
 });
 
@@ -341,7 +357,7 @@ $('.menu-option.clickable input').on('click', function (e) {
 //change cycle by collection
 $('.menu-option.clickable input').on('change', function (e) {
   var el = $(e.target);
-  Cycles.data.cycles[Cycles.data.current][el.attr("name")] = parseInt(el.val());
+  Cycles.categories[el.attr("name")] = parseInt(el.val());
   MapBase.addMarkers();
   Menu.refreshMenu();
 });
@@ -392,7 +408,7 @@ $("#clear-markers").on("click", function () {
 $("#clear-inventory").on("click", function () {
 
   $.each(MapBase.markers, function (key, marker) {
-    if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category] && (marker.amount > 0 || marker.isCollected)) {
+    if (marker.day == Cycles.categories[marker.category] && (marker.amount > 0 || marker.isCollected)) {
       if (Inventory.items[marker.text])
         Inventory.items[marker.text].amount = 0;
 
@@ -466,6 +482,15 @@ $("#overlay-opacity").on("change", function () {
   MapBase.setOverlays(parsed);
 });
 
+//Change & save marker size
+$("#marker-size").on("change", function () {
+  var parsed = parseFloat($("#marker-size").val());
+  Settings.markerSize = parsed ? parsed : 1;
+  $.cookie('marker-size', Settings.markerSize, { expires: 999 });
+  MapBase.addMarkers();
+  Treasures.set();
+});
+
 //Disable & enable collection category
 $('.clickable').on('click', function () {
   var menu = $(this);
@@ -514,7 +539,7 @@ $('.submenu-only').on('click', function (e) {
 //Sell collections on menu
 $('.collection-sell').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
-  var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category]);
+  var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, value) {
     if (value.subdata) {
@@ -530,7 +555,7 @@ $('.collection-sell').on('click', function (e) {
 // Reset collections on menu
 $('.collection-reset').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
-  var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category]);
+  var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, value) {
     if (value.canCollect)
@@ -558,7 +583,7 @@ $(document).on('click', '.collectible-wrapper[data-type]', function () {
   var collectible = $(this).data('type');
   var category = $(this).parent().data('type');
 
-  MapBase.removeItemFromMap(Cycles.data.cycles[Cycles.data.current][category], collectible, collectible, category, true);
+  MapBase.removeItemFromMap(Cycles.categories[category], collectible, collectible, category, true);
 });
 
 //Open & close side menu
@@ -937,11 +962,15 @@ $('#generate-route-railroad-weight').on("change", function () {
 /**
  * Tutorial logic
  */
+var defaultHelpTimeout;
 $('[data-help]').hover(function (e) {
   var attr = $(this).attr('data-help');
+  clearTimeout(defaultHelpTimeout);
   $('#help-container p').attr('data-text', `help.${attr}`).text(Language.get(`help.${attr}`));
 }, function () {
-  $('#help-container p').attr('data-text', `help.default`).text(Language.get(`help.default`));
+  defaultHelpTimeout = setTimeout(function () {
+    $('#help-container p').attr('data-text', `help.default`).text(Language.get(`help.default`));
+  }, 100);
 });
 
 $('#show-help').on("change", function () {
@@ -1003,9 +1032,9 @@ $('#delete-all-settings').on('click', function () {
 
 $(function () {
   init();
+  MapBase.loadWeeklySet();
   Cycles.load();
   Inventory.init();
-  MapBase.loadWeeklySet();
   MapBase.loadFastTravels();
   MadamNazar.loadMadamNazar();
   Treasures.load();
