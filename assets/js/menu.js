@@ -66,7 +66,7 @@ Menu.refreshMenu = function () {
 
     // Prevents 404 errors. If doing the if-statement the other way round, jQuery tries to load the images.
     if (marker.category != 'random')
-      collectibleImage = $('<img>').attr('src', `./assets/images/icons/game/${collectibleKey}.png`).addClass('collectible-icon');
+      collectibleImage = $('<img>').attr('src', `./assets/images/icons/game/${collectibleKey}.png`).attr('alt', 'Set icon').addClass('collectible-icon');
 
     var collectibleElement = $('<div>').addClass('collectible-wrapper').attr('data-help', 'item').attr('data-type', collectibleText);
     var collectibleTextWrapperElement = $('<span>').addClass('collectible-text');
@@ -86,14 +86,12 @@ Menu.refreshMenu = function () {
       Inventory.changeMarkerAmount(collectibleText, 1);
     });
 
-    collectibleElement.on('contextmenu', function (event) {
-      if ($.cookie('right-click') != null)
-        return;
+    collectibleElement.on('contextmenu', function (e) {
+      if ($.cookie('right-click') == null)
+        e.preventDefault();
 
-      event.preventDefault();
       if (marker.subdata != 'agarita' && marker.subdata != 'blood_flower')
         MapBase.highlightImportantItem(marker.subdata || marker.text);
-
     });
 
     var collectibleCountElement = $('<span>').addClass('counter').append(collectibleCountDecreaseElement).append(collectibleCountTextElement).append(collectibleCountIncreaseElement);
@@ -144,10 +142,8 @@ Menu.refreshMenu = function () {
       }
     });
 
-    var defaultHelpTimeout;
-    collectibleElement.hover(function (e) {
-      clearTimeout(defaultHelpTimeout);
-      var language = Language.get(`help.${$(this).data('help')}`);
+    collectibleElement.hover(function () {
+      let language = Language.get(`help.${$(this).data('help')}`);
 
       if (language.indexOf('{collection}') !== -1) {
         language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current));
@@ -155,9 +151,7 @@ Menu.refreshMenu = function () {
 
       $('#help-container p').text(language);
     }, function () {
-      defaultHelpTimeout = setTimeout(function () {
-        $('#help-container p').text(Language.get(`help.default`));
-      }, 100);
+      $('#help-container p').text(Language.get(`help.default`));
     });
 
     $(`.menu-hidden[data-type=${marker.category}]`).append(collectibleElement.append(collectibleImage).append(collectibleTextWrapperElement.append(collectibleTextElement).append(collectibleCountElement)));

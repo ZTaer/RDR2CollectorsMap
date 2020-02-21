@@ -10,6 +10,8 @@ var MapBase = {
   markers: [],
   itemsMarkedAsImportant: [],
   isDarkMode: false,
+  updateLoopAvailable: true,
+  requestLoopCancel: false,
 
   init: function () {
 
@@ -198,23 +200,19 @@ var MapBase = {
     var curDate = new Date();
     date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
 
-    if (date != $.cookie('date')) {
+    if (date != $.cookie('date') && Settings.resetMarkersDaily) {
+      console.log('New day, resetting markers...');
       var markers = MapBase.markers;
       $.each(markers, function (key, value) {
+        if (Inventory.items[value.text])
+          Inventory.items[value.text].isCollected = false;
 
-        if (Settings.resetMarkersDaily) {
-          console.log('New day, resetting markers...');
+        markers[key].isCollected = false;
 
-          if (Inventory.items[value.text])
-            Inventory.items[value.text].isCollected = false;
-
-          markers[key].isCollected = false;
-
-          if (Inventory.isEnabled)
-            markers[key].canCollect = value.amount < Inventory.stackSize;
-          else
-            markers[key].canCollect = true;
-        }
+        if (Inventory.isEnabled)
+          markers[key].canCollect = value.amount < Inventory.stackSize;
+        else
+          markers[key].canCollect = true;
 
         // reset all random spots at cycle change
         if (value.category == 'random') {
@@ -294,6 +292,14 @@ var MapBase = {
   },
 
   addMarkers: function (refreshMenu = false) {
+    if (!MapBase.updateLoopAvailable) {
+      MapBase.requestLoopCancel = true;
+      setTimeout(() => {
+        MapBase.addMarkers(refreshMenu);
+      }, 0);
+      return;
+    }
+
     if (Layers.itemMarkersLayer != null)
       Layers.itemMarkersLayer.clearLayers();
     if (Layers.miscLayer != null)
@@ -301,23 +307,36 @@ var MapBase = {
 
     var opacity = Settings.markerOpacity;
 
-    $.each(MapBase.markers, function (key, marker) {
-      //Set isVisible to false. addMarkerOnMap will set to true if needs
-      marker.isVisible = false;
+    MapBase.updateLoopAvailable = false;
+    MapBase.yieldingLoop(
+      MapBase.markers.length,
+      25,
+      function (i) {
+        if (MapBase.requestLoopCancel) return;
 
-      if (marker.subdata != null)
-        if (categoriesDisabledByDefault.includes(marker.subdata))
-          return;
+        var marker = MapBase.markers[i];
 
-      MapBase.addMarkerOnMap(marker, opacity);
-    });
+        // Set isVisible to false. addMarkerOnMap will set to true if needs
+        marker.isVisible = false;
+
+        if (marker.subdata != null)
+          if (categoriesDisabledByDefault.includes(marker.subdata))
+            return;
+
+        MapBase.addMarkerOnMap(marker, opacity);
+      },
+      function () {
+        MapBase.updateLoopAvailable = true;
+        MapBase.requestLoopCancel = false;
+        Menu.refreshItemsCounter();
+      }
+    );
 
     Layers.itemMarkersLayer.addTo(MapBase.map);
     Layers.pinsLayer.addTo(MapBase.map);
 
     MapBase.addFastTravelMarker();
 
-    Menu.refreshItemsCounter();
     Treasures.addToMap();
     Encounters.addToMap();
     MadamNazar.addMadamNazar();
@@ -395,8 +414,14 @@ var MapBase = {
 
           marker.canCollect = true;
         }
-        if (PathFinder !== undefined) {
-          PathFinder.wasRemovedFromMap(marker);
+
+        try {
+          if (PathFinder !== undefined) {
+            PathFinder.wasRemovedFromMap(marker);
+          }
+        } catch (error) {
+          alert(Language.get('alerts.feature_not_supported'));
+          console.error(error);
         }
       });
 
@@ -600,6 +625,10 @@ var MapBase = {
       if (Routes.customRouteEnabled) e.target.closePopup();
     });
 
+    tempMarker.on("contextmenu", function (e) {
+      MapBase.removeItemFromMap(marker.day || '', marker.text || '', marker.subdata || '', marker.category || '');
+    });
+
     Layers.itemMarkersLayer.addLayer(tempMarker);
     if (Settings.markerCluster)
       Layers.oms.addMarker(tempMarker);
@@ -727,5 +756,20 @@ var MapBase = {
     var _month = monthNames[date.split('/')[1] - 1];
     var _year = date.split('/')[0];
     return `${_month} ${pad(_day, 2)} ${_year}`;
+  },
+
+  yieldingLoop: function (count, chunksize, callback, finished) {
+    var i = 0;
+    (function chunk() {
+      var end = Math.min(i + chunksize, count);
+      for (; i < end; ++i) {
+        callback.call(null, i);
+      }
+      if (i < count) {
+        setTimeout(chunk, 0);
+      } else {
+        finished.call(null);
+      }
+    })();
   }
 };

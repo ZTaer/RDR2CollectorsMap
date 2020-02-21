@@ -128,12 +128,17 @@ function init() {
     $.cookie('overlay-opacity', '0.5', { expires: 999 });
   }
 
+  if ($.cookie('cycle-input-enabled') === undefined) {
+    Settings.isCycleInputEnabled = 1;
+    $.cookie('cycle-input-enabled', '1', { expires: 999 });
+  }
+
   if ($.cookie('clock-or-timer') === undefined) {
     Settings.displayClockHideTimer = false;
     $.cookie('clock-or-timer', 'false', { expires: 999 });
   }
 
-  if (typeof $.cookie('timestamps-24') === 'undefined') {
+  if ($.cookie('timestamps-24') === undefined) {
     Settings.display24HoursTimestamps = false;
     $.cookie('timestamps-24', 'false', { expires: 999 });
   }
@@ -166,15 +171,17 @@ function init() {
   $('#show-coordinates').prop("checked", Settings.isCoordsEnabled);
   $('#timestamps-24').prop("checked", Settings.display24HoursTimestamps);
   $('#sort-items-alphabetically').prop("checked", Settings.sortItemsAlphabetically);
+  $('#enable-cycle-input').prop("checked", Settings.isCycleInputEnabled);
   $("#enable-right-click").prop('checked', $.cookie('right-click') != null);
   $("#enable-debug").prop('checked', $.cookie('debug') != null);
+  $("#enable-cycle-changer").prop('checked', $.cookie('cycle-changer-enabled') != null);
 
   $("#help-container").toggle(Settings.showHelp);
 
   $('.timer-container').toggleClass('hidden', Settings.displayClockHideTimer);
   $('.clock-container').toggleClass('hidden', !(Settings.displayClockHideTimer));
-
-  $('#cycle-changer-container').toggleClass('hidden', !(Settings.isDebugEnabled));
+  $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
+  $('#cycle-changer-container').toggleClass('hidden', !(Settings.isCycleChangerEnabled));
 
   Pins.addToMap();
   changeCursor();
@@ -209,9 +216,12 @@ function setMapBackground(mapIndex) {
 function changeCursor() {
   if (Settings.isCoordsEnabled || Routes.customRouteEnabled)
     $('.leaflet-grab').css('cursor', 'pointer');
-  else
+  else {
     $('.leaflet-grab').css('cursor', 'grab');
+    $('.lat-lng-container').css('display', 'none');
+  }
 }
+
 function addZeroToNumber(number) {
   if (number < 10)
     number = '0' + number;
@@ -326,13 +336,24 @@ $('#enable-debug').on("change", function () {
   if ($("#enable-debug").prop('checked')) {
     Settings.isDebugEnabled = true;
     $.cookie('debug', '1', { expires: 999 });
-
-    $('#cycle-changer-container').removeClass('hidden');
   } else {
     Settings.isDebugEnabled = false;
     $.removeCookie('debug');
+  }
+});
+
+$('#enable-cycle-changer').on("change", function () {
+  if ($("#enable-cycle-changer").prop('checked')) {
+    Settings.isCycleChangerEnabled = true;
+    $.cookie('cycle-changer-enabled', '1', { expires: 999 });
+
+    $('#cycle-changer-container').removeClass('hidden');
+  } else {
+    Settings.isCycleChangerEnabled = false;
+    $.removeCookie('cycle-changer-enabled');
 
     $('#cycle-changer-container').addClass('hidden');
+    Cycles.resetCycle();
   }
 });
 
@@ -481,6 +502,13 @@ $("#marker-size").on("change", function () {
   $.cookie('marker-size', Settings.markerSize, { expires: 999 });
   MapBase.addMarkers();
   Treasures.set();
+});
+
+//Enable cycle input
+$("#enable-cycle-input").on("change", function () {
+  Settings.isCycleInputEnabled = $("#enable-cycle-input").prop('checked');
+  $.cookie('cycle-input-enabled', Settings.isCycleInputEnabled ? '1' : '0', { expires: 999 });
+  $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
 });
 
 //Disable & enable collection category
@@ -672,15 +700,31 @@ $('#pins-export').on("click", function () {
 $('#pins-import').on('click', function () {
   try {
     var file = $('#pins-import-file').prop('files')[0];
+    var fallback = false;
 
     if (!file) {
       alert(Language.get('alerts.file_not_found'));
       return;
     }
 
-    file.text().then(function (text) {
-      Pins.importPins(text);
-    });
+    try {
+      file.text().then((text) => {
+        Pins.importPins(text);
+      });
+    } catch (error) {
+      fallback = true;
+    }
+
+    if (fallback) {
+      var reader = new FileReader();
+
+      reader.addEventListener('loadend', (e) => {
+        var text = e.srcElement.result;
+        Pins.importPins(text);
+      });
+
+      reader.readAsText(file);
+    }
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -758,52 +802,80 @@ $('#cookie-export').on("click", function () {
   }
 });
 
+function setSettings(settings) {
+     // Import all the settings from the file.
+     if (settings.cookies === undefined && settings.local === undefined) {
+      $.each(settings, function (key, value) {
+        $.cookie(key, value, { expires: 999 });
+      });
+    }
+
+    $.each(settings.cookies, function (key, value) {
+      $.cookie(key, value, { expires: 999 });
+    });
+
+    $.each(settings.local, function (key, value) {
+      localStorage.setItem(key, value);
+    });
+
+    // Do this for now, maybe look into refreshing the menu completely (from init) later.
+    location.reload();
+}
+
 $('#cookie-import').on('click', function () {
   try {
+    var settings = null;
     var file = $('#cookie-import-file').prop('files')[0];
+    var fallback = false;
 
     if (!file) {
       alert(Language.get('alerts.file_not_found'));
       return;
     }
 
-    file.text().then(function (res) {
-      var settings = null;
+    try {
+      file.text().then((text) => {
+        try {  
+          settings = JSON.parse(text);
 
-      try {
-        settings = JSON.parse(res);
-      } catch (error) {
-        alert(Language.get('alerts.file_not_valid'));
-        return;
-      }
+          setSettings(settings);
 
-      // Remove all current settings.
-      $.each($.cookie(), function (key, value) {
-        $.removeCookie(key);
+        } catch (error) {
+          alert(Language.get('alerts.file_not_valid'));
+          return;
+        }
+      });
+    } catch (error) {
+      fallback = true;
+    }
+   
+    if (fallback) {
+      var reader = new FileReader();
+
+      reader.addEventListener('loadend', (e) => {
+        var text = e.srcElement.result;
+
+        try {
+          settings = JSON.parse(text);
+          setSettings(settings);
+        } catch (error) {
+          alert(Language.get('alerts.file_not_valid'));
+          return;
+        }
       });
 
-      $.each(localStorage, function (key, value) {
-        localStorage.removeItem(key);
-      });
+      reader.readAsText(file);
+    }
 
-      // Import all the settings from the file.
-      if (settings.cookies === undefined && settings.local === undefined) {
-        $.each(settings, function (key, value) {
-          $.cookie(key, value, { expires: 999 });
-        });
-      }
-
-      $.each(settings.cookies, function (key, value) {
-        $.cookie(key, value, { expires: 999 });
-      });
-
-      $.each(settings.local, function (key, value) {
-        localStorage.setItem(key, value);
-      });
-
-      // Do this for now, maybe look into refreshing the menu completely (from init) later.
-      location.reload();
+    // Remove all current settings.
+    $.each($.cookie(), function (key, value) {
+      $.removeCookie(key);
     });
+
+    $.each(localStorage, function (key, value) {
+      localStorage.removeItem(key);
+    });
+
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -968,7 +1040,7 @@ $('[data-help]').hover(function (e) {
 
 $('#show-help').on("change", function () {
   Settings.showHelp = $("#show-help").prop('checked');
-  $.cookie('show-help', Settings.isHelpEnabled ? '1' : '0', { expires: 999 });
+  $.cookie('show-help', Settings.showHelp ? '1' : '0', { expires: 999 });
 
   $("#help-container").toggle(Settings.showHelp);
 });
@@ -995,10 +1067,9 @@ L.LayerGroup.include({
 });
 
 // Disable annoying menu on right mouse click
-$('*').on('contextmenu', function (event) {
-  if ($.cookie('right-click') != null)
-    return;
-  event.preventDefault();
+$('*').on('contextmenu', function (e) {
+  if ($.cookie('right-click') == null)
+    e.preventDefault();
 });
 
 // reset all settings & cookies
@@ -1013,6 +1084,29 @@ $('#delete-all-settings').on('click', function () {
   });
 
   location.reload(true);
+});
+
+/**
+ * Modals
+ */
+$('#open-clear-markers-modal').on('click', function () {
+  $('#clear-markers-modal').modal();
+});
+
+$('#open-clear-important-items-modal').on('click', function () {
+  $('#clear-important-items-modal').modal();
+});
+
+$('#open-clear-inventory-modal').on('click', function () {
+  $('#clear-inventory-modal').modal();
+});
+
+$('#open-clear-routes-modal').on('click', function () {
+  $('#clear-routes-modal').modal();
+});
+
+$('#open-delete-all-settings-modal').on('click', function () {
+  $('#delete-all-settings-modal').modal();
 });
 
 /**
