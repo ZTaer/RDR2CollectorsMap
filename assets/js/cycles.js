@@ -8,7 +8,10 @@ var Cycles = {
   yesterday: [],
 
   load: function () {
-    $.getJSON('data/cycles.json?nocache=' + nocache)
+    var date = new Date();
+    var dateString = (date.getUTCMonth() + 1) + '-' + date.getUTCDate() + '-' + date.getUTCFullYear();
+
+    $.getJSON(`data/cycles.json?nocache=${nocache}&date=${dateString}`)
       .done(function (_data) {
         Cycles.data = _data;
         Cycles.getTodayCycle();
@@ -99,7 +102,9 @@ var Cycles = {
 
   setCycles: function () {
     for (var category in Cycles.categories) {
-      $(`input[name=${category}]`).val(Cycles.categories[category]);
+      var cycle = Cycles.categories[category];
+      $(`input[name=${category}]`).val(cycle);
+      $(`.cycle-icon[data-type=${category}]`).attr("src", `./assets/images/cycle_${cycle}.png`).attr("alt", `Cycle ${cycle}`);
     }
 
     MapBase.addMarkers(true);
