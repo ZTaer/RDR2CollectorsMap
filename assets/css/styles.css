@@ -975,6 +975,17 @@ a.no-style:visited {
     .counter-menu-opened {
         display: none;
     }
+    .side-menu .menu-hidden .collectible-icon {
+        margin-top: 7px;
+    }
+    .counter-button {
+        height: 32px;
+        width: 32px;
+        line-height: 1.5;
+    }
+    .side-menu .menu-hidden .collectible, .input-container label {
+        line-height: 38px;
+    }
 }
 
 @media (min-width: 1025px) {
