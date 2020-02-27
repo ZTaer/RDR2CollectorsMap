@@ -21,14 +21,15 @@
   <!-- Preconnects to improve performance -->
   <link rel="preconnect" href="https://pepegapi.jeanropke.net">
   <link rel="preconnect" href="https://jeanropke.b-cdn.net">
+  <link rel="preconnect" href="https://s.rsg.sc">
 
   <link rel="stylesheet" href="assets/css/leaflet.css" />
   <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
 
-  <link rel="stylesheet" href="assets/css/styles.css?nocache=20200225118" />
+  <link rel="stylesheet" href="assets/css/styles.css?nocache=1348" />
 
   <script>
-    var nocache = 20200225118;
+    var nocache = 1348;
   </script>
 </head>
 
@@ -39,7 +40,7 @@
       <div id="main-header-center">
         <span data-text="menu.collectables">Collectables</span>
         <h3 id="sub-header">
-          <span class="cycle-data" dir="auto">Loading</span> - <span class="collectables-counter" data-text="menu.collectables_counter" dir="auto">Collected -- of --</span><span id="items-value"></span>
+          <span class="cycle-data" dir="auto">Loading</span> - <span class="collectables-counter" data-text="menu.collectables_counter" dir="auto">Collected -- of --</span> - <span id="items-value"></span>
         </h3>
       </div>
       <img id="main-header-right" src="./assets/images/header_bg_right.png" alt="">
@@ -50,11 +51,23 @@
         <div id="copy-search-link" class="input-action-copy" data-help="search_copy_link"></div>
       </div>
     </div>
-    <div id='cycle-changer-container' class="collection-value cycle-changer hidden">
+    <div id="cycle-changer-container" class="collection-value cycle-changer hidden">
       <div id="cycle-prev" class="input-selection-arrow"><img src="assets/images/selection_left.png" alt="arrow"></div>
       <span class="cycle-data">¯\_(ツ)_/¯</span>
       <div id="cycle-next" class="input-selection-arrow"><img src="assets/images/selection_right.png" alt="arrow"></div>
     </div>
+
+    <div id="weekly-container">
+      <div class="header">
+        <span class="header-border"></span>
+        <h2 class="header-title weekly-item-title">Weekly Collection</h2>
+        <span class="header-border"></span>
+      </div>
+      <div class="weekly-item-listings">
+        <p data-text="menu.weekly_item_description">This week's collection consists of these items. Collect them all and send them to Madam Nazar for an XP and RDO$ bonus.</p>
+      </div>
+    </div>
+
     <div class="links-container">
       <a data-text="menu.hide_all" data-help="hide_all" href="javascript:void(0);" onclick="Menu.hideAll()">Hide all</a>
       <a data-text="menu.show_all" data-help="show_all" href="javascript:void(0);" onclick="Menu.showAll()">Show all</a>
@@ -318,7 +331,7 @@
           <img class="icon" src="./assets/images/icons/random.png" alt="Category icon" />
           <span class="menu-option-text" data-text="menu.random_spots">Random Spots</span>
         </span>
-        <input class="input-text input-cycle random" type="number" min="1" max="7" name="random" data-help="item_manual_cycle">
+        <input class="input-text input-cycle random" type="number" min="1" max="6" name="random" data-help="item_manual_cycle">
         <img class="cycle-icon random" src="./assets/images/cycle_3.png" alt="Cycle 3" data-type="random">
       </div>
     </div>
@@ -521,6 +534,13 @@
         <div class="input-action"></div>
       </div>
       <hr class="menu-divider">
+      <div class="input-container" data-help="show_weekly">
+        <label for="show-weekly" data-text="menu.show_weekly">Show weekly collection</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="show-weekly" value="1" id="show-weekly" />
+          <label class="input-checkbox-label" for="show-weekly"></label>
+        </div>
+      </div>
       <div class="input-container" data-help="show_utilities">
         <label for="show-utilities" data-text="menu.show_utilities">Show utility settings</label>
         <div class="input-checkbox-wrapper">
@@ -603,6 +623,19 @@
             <option value="0.6" data-text="menu.marker_opacity.60">60%</option>
             <option value="0.8" data-text="menu.marker_opacity.80" selected>80%</option>
             <option value="1" data-text="menu.marker_opacity.100" selected>Opaque</option>
+          </select>
+        </div>
+        <div class="input-container" data-help="custom_marker_color">
+          <label for="custom-marker-color" data-text="menu.custom_marker_color">Markers color</label>
+          <select class="input-text wide-select-menu" id="custom-marker-color">
+            <option value="0" data-text="menu.custom_marker_default">Default colors</option>
+            <option value="1" style="background-color: #36A6D8" data-text="menu.custom_marker_blue">Blue</option>
+            <option value="2" style="background-color: #EF922E" data-text="menu.custom_marker_orange">Orange</option>
+            <option value="3" style="background-color: #D050B7" data-text="menu.custom_marker_pink">Pink</option>
+            <option value="4" style="background-color: #563565" data-text="menu.custom_marker_purple">Purple</option>
+            <option value="5" style="background-color: #A13134" data-text="menu.custom_marker_dark_red">Dark red</option>
+            <option value="6" style="background-color: #00649F" data-text="menu.custom_marker_dark_blue">Dark blue</option>
+            <option value="7" data-text="menu.custom_marker_fixed_colors">Fixed colors</option>
           </select>
         </div>
         <div class="input-container" data-help="marker_cluster">
@@ -892,7 +925,7 @@
       <span class="header-border"></span>
     </div>
     <div class="settings-container">
-      <a class="no-style" target="_blank" href="https://jeanropke.github.io/RDOMap/">
+      <a class="no-style" href="https://jeanropke.github.io/RDOMap/">
         <div class="input-container clickable" data-help="rdo_map">
           <label data-text="menu.rdo_map">RDO Map</label>
           <div class="input-action external"></div>
@@ -1086,22 +1119,22 @@
   <script>var module = {};</script>
   <script src="assets/js/lib/leaflet.canvas-markers.js"></script>
   <script>module.exports(L);</script>
-  <script src="assets/js/layers.js?nocache=20200225118"></script>
-  <script src="assets/js/settings.js?nocache=20200225118"></script>
-  <script src="assets/js/nazar.js?nocache=20200225118"></script>
-  <script src="assets/js/cycles.js?nocache=20200225118"></script>
-  <script src="assets/js/marker.js?nocache=20200225118"></script>
-  <script src="assets/js/inventory.js?nocache=20200225118"></script>
-  <script src="assets/js/treasures.js?nocache=20200225118"></script>
-  <script src="assets/js/encounters.js?nocache=20200225118"></script>
-  <script src="assets/js/pins.js?nocache=20200225118"></script>
-  <script src="assets/js/map.js?nocache=20200225118"></script>
-  <script src="assets/js/language.js?nocache=20200225118"></script>
-  <script src="assets/js/menu.js?nocache=20200225118"></script>
-  <script src="assets/js/itemsValue.js?nocache=20200225118"></script>
-  <script src="assets/js/routes.js?nocache=20200225118"></script>
-  <script src="assets/js/pathfinder.js?nocache=20200225118"></script>
-  <script src="assets/js/scripts.js?nocache=20200225118"></script>
+  <script src="assets/js/layers.js?nocache=1348"></script>
+  <script src="assets/js/settings.js?nocache=1348"></script>
+  <script src="assets/js/nazar.js?nocache=1348"></script>
+  <script src="assets/js/cycles.js?nocache=1348"></script>
+  <script src="assets/js/marker.js?nocache=1348"></script>
+  <script src="assets/js/inventory.js?nocache=1348"></script>
+  <script src="assets/js/treasures.js?nocache=1348"></script>
+  <script src="assets/js/encounters.js?nocache=1348"></script>
+  <script src="assets/js/pins.js?nocache=1348"></script>
+  <script src="assets/js/map.js?nocache=1348"></script>
+  <script src="assets/js/language.js?nocache=1348"></script>
+  <script src="assets/js/menu.js?nocache=1348"></script>
+  <script src="assets/js/itemsValue.js?nocache=1348"></script>
+  <script src="assets/js/routes.js?nocache=1348"></script>
+  <script src="assets/js/pathfinder.js?nocache=1348"></script>
+  <script src="assets/js/scripts.js?nocache=1348"></script>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-39999584-4"></script>

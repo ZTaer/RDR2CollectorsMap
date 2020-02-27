@@ -52,7 +52,7 @@ var Routes = {
       $.each(input, function (key, value) {
         var _marker = MapBase.markers.filter(marker => marker.text == value && marker.day == Cycles.categories[marker.category])[0];
         if (_marker == null) {
-          console.log(`Item not found on map: '${value}'`);
+          console.error(`Item not found on map: '${value}'`);
         } else {
           connections.push([_marker.lat, _marker.lng]);
         }
@@ -68,7 +68,7 @@ var Routes = {
       MapBase.map.addLayer(Routes.polylines);
     } catch (e) {
       alert(Language.get('routes.invalid'));
-      console.log(e);
+      console.error(e);
     }
   },
 
@@ -291,12 +291,8 @@ var Routes = {
       newMarkers = newMarkers.filter((marker) => { return marker.canCollect && !marker.isCollected; });
     }
 
-    if (Inventory.isEnabled) {
-      newMarkers = newMarkers.filter((marker) => { return marker.amount < Inventory.stackSize; });
-    }
-
     if (Routes.importantOnly) {
-      newMarkersImp = newMarkers.filter((marker) => { return MapBase.itemsMarkedAsImportant.indexOf(marker.text) >= 0; });
+      newMarkersImp = newMarkers.filter((marker) => { return MapBase.importantItems.indexOf(marker.text) >= 0; });
       if (newMarkers.length > 0 && newMarkersImp.length == 0) {
         if (!confirm(Language.get('dialog.generate_route_important_only_ignore'))) {
           return;

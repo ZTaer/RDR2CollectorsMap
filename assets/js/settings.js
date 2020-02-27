@@ -22,7 +22,9 @@ var Settings = {
   showHelp: $.cookie('show-help') == '1',
   sortItemsAlphabetically: $.cookie('sort-items-alphabetically') == '1',
   toolType: $.cookie('tools') ? $.cookie('tools') : '3',
+  markersCustomColor: parseFloat($.cookie('custom-markers-color')) ? parseFloat($.cookie('custom-markers-color')) : 0,
 
+  showWeeklySettings: $.cookie('show-weekly') == '1',
   showUtilitiesSettings: $.cookie('show-utilities') == '1',
   showCustomizationSettings: $.cookie('show-customization') == '1',
   showRoutesSettings: $.cookie('show-routes') == '1',
