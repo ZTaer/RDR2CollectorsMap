@@ -232,12 +232,23 @@ var MapBase = {
     var curDate = new Date();
     date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
 
-    if (Settings.resetMarkersDaily && date != $.cookie('date')) {
+    if (date != $.cookie('date')) {
       var markers = MapBase.markers;
-      $.each(markers, function (key, value) {
-        markers[key].isCollected = false;
-        markers[key].canCollect = markers[key].amount < Inventory.stackSize;
-      });
+
+      if (Settings.resetMarkersDaily) {
+        $.each(markers, function (key, value) {
+          markers[key].isCollected = false;
+          markers[key].canCollect = markers[key].amount < Inventory.stackSize;
+        });
+      }
+      else {
+        $.each(markers, function (key, value) {
+          if (value.category === 'random') {
+            markers[key].isCollected = false;
+            markers[key].canCollect = true;
+          }
+        });
+      }
 
       MapBase.markers = markers;
       MapBase.saveCollectedItems();
@@ -355,6 +366,8 @@ var MapBase = {
         MapBase.updateLoopAvailable = true;
         MapBase.requestLoopCancel = false;
         Menu.refreshItemsCounter();
+        MapBase.loadImportantItems();
+        Inventory.updateLowAmountItems();
       }
     );
 
@@ -378,7 +391,6 @@ var MapBase = {
     if (Routes.generateOnVisit)
       Routes.generatePath(true);
 
-    MapBase.loadImportantItems();
   },
 
   loadWeeklySet: function () {
@@ -503,6 +515,11 @@ var MapBase = {
   },
 
   getIconColor: function (value) {
+    // use the same color if we want to highlight items with low amount
+    if (Inventory.highlightLowAmountItems && Inventory.isEnabled) {
+      return MapBase.isDarkMode ? "darkblue" : "orange";
+    }
+
     switch (value) {
       case "day_1":
         return "blue";
@@ -662,7 +679,8 @@ var MapBase = {
       : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day));
 
     var icon = `./assets/images/icons/${marker.category}.png`;
-    var background = `./assets/images/icons/marker_${markerBackgroundColor}.png`;
+    var background = `./assets/images/icons/marker_${markerBackgroundColor}.png`;    
+    var markerContour = MapBase.isDarkMode ? './assets/images/icons/marker_contour_orange.png' : './assets/images/icons/marker_contour_blue.png';
     var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
 
     // Random items override
@@ -698,6 +716,7 @@ var MapBase = {
         popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
         html: `
           ${overlay}
+          <img class="marker-contour" src="${markerContour}" alt="markerContour">
           <img class="icon" src="${icon}" alt="Icon">
           <img class="background" src="${background}" alt="Background">
           ${shadow}
@@ -749,8 +768,6 @@ var MapBase = {
     Layers.itemMarkersLayer.addLayer(tempMarker);
     if (Settings.markerCluster)
       Layers.oms.addMarker(tempMarker);
-
-    MapBase.loadImportantItems();
   },
 
   gameToMap: function (lat, lng, name = "Debug Marker") {
@@ -761,16 +778,23 @@ var MapBase = {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
   },
 
-  highlightImportantItem(text, category) {
-    if (category === 'american_flowers' || category === 'bird_eggs')
-      text = text.replace(/(egg_|flower_)(\w+)(_\d)/, '$2');
+  highlightImportantItem: function (text, category = '') {
+    if (category == 'american_flowers' || category == 'bird_eggs')
+      text = text.replace(/(_\d+)/, '');
 
-    $(`[data-type=${text}]`).toggleClass('highlight-important-items-menu');
+    var textMenu = text.replace(/egg_|flower_/, '');
 
-    if (text === 'eagle') // prevent from highlight eagle coins and eggs together
-      text = 'egg_eagle';
+    $(`[data-type=${textMenu}]`).toggleClass('highlight-important-items-menu');
 
-    $(`[data-marker*=${text}]`).toggleClass('highlight-items');
+    $.each($(`[data-marker*=${text}]`), function (key, marker) {
+      if (category !== 'random' && category !== '')
+        var markerData = $(this).data('marker').replace(/_\d/, '');
+      else
+        var markerData = $(this).data('marker');
+
+      if (markerData === text)
+        $(this).toggleClass('highlight-items');
+    });
 
     if ($(`[data-marker*=${text}].highlight-items`).length)
       MapBase.importantItems.push(text);
@@ -784,15 +808,20 @@ var MapBase = {
     localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
   },
 
-  loadImportantItems() {
+  loadImportantItems: function () {
     if (localStorage.importantItems === undefined)
       localStorage.importantItems = "[]";
 
     MapBase.importantItems = JSON.parse(localStorage.importantItems) || [];
 
     $.each(MapBase.importantItems, function (key, value) {
-      $(`[data-marker*=${value}]`).addClass('highlight-items');
-      $(`[data-type=${value}]`).addClass('highlight-important-items-menu');
+      if (/random_item_\d+/.test(value))
+        $(`[data-marker=${value}]`).addClass('highlight-items');
+      else
+        $(`[data-marker*=${value}]`).addClass('highlight-items');
+
+      var textMenu = value.replace(/egg_|flower_/, '');
+      $(`[data-type=${textMenu}]`).addClass('highlight-important-items-menu');
     });
   },
 
@@ -888,4 +917,5 @@ var MapBase = {
       }
     })();
   }
+
 };

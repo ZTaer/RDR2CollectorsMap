@@ -250,6 +250,26 @@ function setMapBackground(mapIndex) {
   }
   MapBase.setOverlays();
   $.cookie('map-layer', mapIndex, { expires: 999 });
+
+  if (Inventory.highlightLowAmountItems) {
+    updateMarkerSources();    
+  }
+}
+
+function updateMarkerSources() {
+  var markerSrc = '';
+  var markerContourSrc = '';
+  
+  if (MapBase.isDarkMode) {
+    markerContourSrc = './assets/images/icons/marker_contour_orange.png';
+    markerSrc = './assets/images/icons/marker_darkblue.png';
+  } else {
+    markerContourSrc = './assets/images/icons/marker_contour_blue.png';
+    markerSrc = './assets/images/icons/marker_orange.png';
+  }
+
+  $('img.background').attr('src', markerSrc);
+  $('img.marker-contour').attr('src', markerContourSrc);    
 }
 
 function changeCursor() {
@@ -352,6 +372,12 @@ $('.timer-container, .clock-container').on('click', function () {
  * jQuery triggers
  */
 
+ /*
+  Hide warning bar
+ */
+$('.update-warning').on('click', function() {
+  $(this).hide();
+});
 //Show all markers on map
 $("#show-all-markers").on("change", function () {
   Settings.showAllMarkers = $("#show-all-markers").prop('checked');
@@ -659,7 +685,7 @@ $('.collection-reset').on('click', function (e) {
   var getMarkers = MapBase.markers.filter(_m => !_m.canCollect && _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, marker) {
-    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category);
+    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category, !Inventory.resetButtonUpdatesInventory);
   });
 
   $(this).removeClass('disabled');
@@ -810,6 +836,7 @@ $('#enable-inventory').on("change", function () {
   MapBase.addMarkers();
   Menu.refreshWeeklyItems();
   Inventory.toggleMenuItemsDisabled();
+  Inventory.toggleHighlightLowAmountItems();
   ItemsValue.reloadInventoryItems();
 
   $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
@@ -819,6 +846,22 @@ $('#enable-inventory-popups').on("change", function () {
   Inventory.isPopupEnabled = $("#enable-inventory-popups").prop('checked');
   $.cookie('inventory-popups-enabled', Inventory.isPopupEnabled ? '1' : '0', { expires: 999 });
 
+  MapBase.addMarkers();
+});
+
+$('#highlight_low_amount_items').on("change", function () {
+  Inventory.highlightLowAmountItems = $('#highlight_low_amount_items').prop("checked");
+  $.cookie('highlight_low_amount_items', Inventory.highlightLowAmountItems ? '1' : '0', { expires: 999 });
+
+  Inventory.toggleHighlightLowAmountItems();
+  
+  MapBase.addMarkers();
+});
+
+$('#animated_highlights').on("change", function () {
+  Inventory.animatedHighlights = $('#animated_highlights').prop("checked");
+  $.cookie('animated_highlights', Inventory.animatedHighlights ? '1' : '0', { expires: 999 });
+  
   MapBase.addMarkers();
 });
 
