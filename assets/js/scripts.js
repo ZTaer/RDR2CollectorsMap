@@ -251,25 +251,8 @@ function setMapBackground(mapIndex) {
   MapBase.setOverlays();
   $.cookie('map-layer', mapIndex, { expires: 999 });
 
-  if (Inventory.highlightLowAmountItems) {
-    updateMarkerSources();    
-  }
-}
-
-function updateMarkerSources() {
-  var markerSrc = '';
-  var markerContourSrc = '';
-  
-  if (MapBase.isDarkMode) {
-    markerContourSrc = './assets/images/icons/marker_contour_orange.png';
-    markerSrc = './assets/images/icons/marker_darkblue.png';
-  } else {
-    markerContourSrc = './assets/images/icons/marker_contour_blue.png';
-    markerSrc = './assets/images/icons/marker_orange.png';
-  }
-
-  $('img.background').attr('src', markerSrc);
-  $('img.marker-contour').attr('src', markerContourSrc);    
+  // Update the highlighted markers to show the appropriate marker colors
+  Inventory.updateLowAmountItems();  
 }
 
 function changeCursor() {
@@ -612,6 +595,7 @@ $('.clickable').on('click', function () {
   if (menu.data('type') === undefined) return;
 
   $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
+
   var isDisabled = menu.hasClass('disabled');
 
   if (isDisabled) {
@@ -839,7 +823,7 @@ $('#enable-inventory').on("change", function () {
   Inventory.toggleHighlightLowAmountItems();
   ItemsValue.reloadInventoryItems();
 
-  $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
+  $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number, .collection-collected').toggle(Inventory.isEnabled);
 });
 
 $('#enable-inventory-popups').on("change", function () {
