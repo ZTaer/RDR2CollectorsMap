@@ -13,7 +13,7 @@ var categories = [
 ];
 
 var categoriesDisabledByDefault = [
-  'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
+  'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
   'wounded_animal', 'rival_collector'
 ];
 
@@ -162,7 +162,7 @@ function setMapBackground(mapIndex) {
   $.cookie('map-layer', mapIndex, { expires: 999 });
 
   // Update the highlighted markers to show the appropriate marker colors
-  Inventory.updateLowAmountItems();  
+  Inventory.updateLowAmountItems();
 }
 
 function changeCursor() {
@@ -255,7 +255,7 @@ setInterval(clockTick, 1000);
 
 $('.timer-container, .clock-container').on('click', function () {
   $('.timer-container, .clock-container').toggleClass('hidden');
-  Settings.displayClockHideTimer = !Settings.displayClockHideTimer;
+  Settings.displayClockHideTimer = $('.timer-container').hasClass('hidden');
 });
 
 /**
@@ -453,7 +453,6 @@ $('.clickable').on('click', function () {
   if (menu.data('type') === undefined) return;
 
   $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
-
   var isDisabled = menu.hasClass('disabled');
 
   if (isDisabled) {
@@ -669,19 +668,26 @@ $('#enable-inventory-popups').on("change", function () {
   MapBase.addMarkers();
 });
 
+$('#reset-inventory-daily').on("change", function () {
+  Inventory.resetInventoryDaily = $("#reset-inventory-daily").prop('checked');
+  $.cookie('reset-inventory-daily', Inventory.resetInventoryDaily ? '1' : '0', { expires: 999 });
+});
+
 $('#highlight_low_amount_items').on("change", function () {
   Inventory.highlightLowAmountItems = $('#highlight_low_amount_items').prop("checked");
   $.cookie('highlight_low_amount_items', Inventory.highlightLowAmountItems ? '1' : '0', { expires: 999 });
 
   Inventory.toggleHighlightLowAmountItems();
-  
+
   MapBase.addMarkers();
 });
 
-$('#animated_highlights').on("change", function () {
-  Inventory.animatedHighlights = $('#animated_highlights').prop("checked");
-  $.cookie('animated_highlights', Inventory.animatedHighlights ? '1' : '0', { expires: 999 });
-  
+$('#highlight_style').on("change", function () {
+  var parsed = parseInt($("#highlight_style").val());
+
+  Inventory.highlightStyle = !isNaN(parsed) ? parsed : Inventory.highlightStyles.ANIMATED_RECOMMENDED;
+  $.cookie('highlight_style', Inventory.highlightStyle, { expires: 999 });
+
   MapBase.addMarkers();
 });
 
