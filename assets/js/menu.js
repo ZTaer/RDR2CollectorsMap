@@ -128,7 +128,7 @@ Menu.refreshMenu = function () {
 
         else if (marker.category === 'bird_eggs')
           prefix = 'egg_';
-        MapBase.highlightImportantItem(prefix + (marker.subdata || marker.text), marker.category);
+        MapBase.highlightImportantItem(prefix + collectibleText, marker.category);
       }
     });
 
@@ -260,7 +260,6 @@ Menu.hideAll = function () {
 
   MapBase.addMarkers();
   Treasures.addToMap();
-  Encounters.addToMap();
 };
 
 Menu.refreshItemsCounter = function () {
