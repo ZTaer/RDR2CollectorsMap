@@ -96,7 +96,7 @@ Menu.refreshMenu = function () {
     var collectibleImage = null;
 
     // Prevents 404 errors. If doing the if-statement the other way round, jQuery tries to load the images.
-    if (marker.category != 'random')
+    if (marker.category !== 'random')
       collectibleImage = $('<img>').attr('src', `./assets/images/icons/game/${collectibleKey}.png`).attr('alt', 'Set icon').addClass('collectible-icon');
 
     var collectibleElement = $('<div>').addClass('collectible-wrapper').attr('data-help', 'item').attr('data-type', collectibleText);
@@ -167,7 +167,9 @@ Menu.refreshMenu = function () {
 
       if (currentSubdataMarkers.every(function (marker) { return !marker.canCollect; }))
         collectibleElement.addClass('disabled');
-    } else {
+      
+    }
+    else {
       if (!marker.canCollect)
         collectibleElement.addClass('disabled');
     }
