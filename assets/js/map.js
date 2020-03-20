@@ -214,7 +214,7 @@ var MapBase = {
     var curDate = new Date();
     date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
 
-    if (date != Settings.date) {
+    if (localStorage.getItem('main.date') === null || date != localStorage.getItem('main.date')) {
       var markers = MapBase.markers;
 
       $.each(markers, function (key, value) {
@@ -241,7 +241,7 @@ var MapBase = {
       MapBase.saveCollectedItems();
     }
 
-    Settings.date = date;
+    localStorage.setItem('main.date', date);
 
     MapBase.addMarkers(true);
 
@@ -499,7 +499,7 @@ var MapBase = {
     }
 
     if (InventorySettings.isEnabled && InventorySettings.highlightLowAmountItems &&
-      (InventorySettings.highlightStyle === InventorySettings.highlightStyles.STATIC_RECOMMENDED || InventorySettings.highlightStyle === InventorySettings.highlightStyles.ANIMATED_RECOMMENDED)) {
+      (InventorySettings.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED || InventorySettings.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
       return MapBase.isDarkMode ? "darkblue" : "orange";
     }
 
@@ -529,8 +529,8 @@ var MapBase = {
     };
 
     if (InventorySettings.highlightLowAmountItems &&
-      (InventorySettings.highlightStyle === InventorySettings.highlightStyles.STATIC_RECOMMENDED ||
-        InventorySettings.highlightStyle === InventorySettings.highlightStyles.ANIMATED_RECOMMENDED)) {
+      (InventorySettings.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED ||
+        InventorySettings.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
       return MapBase.isDarkMode ? "orange" : "darkblue";
     }
 
@@ -793,18 +793,21 @@ var MapBase = {
     else
       MapBase.importantItems.splice(MapBase.importantItems.indexOf(text), 1);
 
-    $.each(localStorage, function (key) {
-      localStorage.removeItem('importantItems');
-    });
+    localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
+  },
 
+  clearImportantItems: function () {
+    $('.highlight-items').removeClass('highlight-items');
+    $('.highlight-important-items-menu').removeClass('highlight-important-items-menu');
+    MapBase.importantItems = [];
     localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
   },
 
   loadImportantItems: function () {
-    if (localStorage.importantItems === undefined)
-      localStorage.importantItems = "[]";
-
-    MapBase.importantItems = JSON.parse(localStorage.importantItems) || [];
+    if (localStorage.getItem('importantItems') === undefined)
+      MapBase.importantItems = [];
+    else
+      MapBase.importantItems = JSON.parse(localStorage.getItem('importantItems')) || [];
 
     $.each(MapBase.importantItems, function (key, value) {
       if (/random_item_\d+/.test(value))

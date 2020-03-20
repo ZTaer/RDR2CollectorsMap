@@ -56,12 +56,13 @@ Menu.addCycleWarning = function (element, isSameCycle) {
 };
 
 Menu.refreshMenu = function () {
-  if (weeklySetData.current == null)
-    return;
-
   $('.menu-hidden[data-type]').children('.collectible-wrapper').remove();
 
-  var weeklyItems = weeklySetData.sets[weeklySetData.current];
+  var weeklyItems = [];
+  if (weeklySetData.current !== null) {
+    weeklyItems = weeklySetData.sets[weeklySetData.current];
+  }
+
   var anyUnavailableCategories = [];
 
   $.each(MapBase.markers, function (_key, marker) {
@@ -72,7 +73,6 @@ Menu.refreshMenu = function () {
 
     var collectibleKey = null;
     var collectibleText = null;
-    var collectibleTitle = null;
 
     switch (marker.category) {
       case 'american_flowers':
@@ -87,12 +87,11 @@ Menu.refreshMenu = function () {
 
     if (marker.subdata) {
       collectibleText = marker.subdata;
-      collectibleTitle = Language.get(`${collectibleKey}.name`);
     } else {
       collectibleText = marker.text;
-      collectibleTitle = marker.title;
     }
-
+    
+    var collectibleTitle = Language.get(`${collectibleKey}.name`);
     var collectibleImage = null;
 
     // Prevents 404 errors. If doing the if-statement the other way round, jQuery tries to load the images.
@@ -167,11 +166,8 @@ Menu.refreshMenu = function () {
 
       if (currentSubdataMarkers.every(function (marker) { return !marker.canCollect; }))
         collectibleElement.addClass('disabled');
-
-    }
-    else {
-      if (!marker.canCollect)
-        collectibleElement.addClass('disabled');
+    } else {
+      if (!marker.canCollect) collectibleElement.addClass('disabled');
     }
 
     $.each(weeklyItems, function (key, weeklyItem) {
@@ -184,8 +180,11 @@ Menu.refreshMenu = function () {
     collectibleElement.hover(function () {
       let language = Language.get(`help.${$(this).data('help')}`);
 
-      if (language.indexOf('{collection}') !== -1) {
-        language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current));
+      if (weeklySetData.current !== null) {
+        // Just let "{collection}" be visible so at least stuff doesn't break too hard.
+        if (language.indexOf('{collection}') !== -1) {
+          language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current));
+        }
       }
 
       $('#help-container p').text(language);
@@ -315,10 +314,7 @@ Menu.refreshWeeklyItems = function () {
 
 // Remove highlight from all important items
 $('#clear_highlights').on('click', function () {
-  var tempArray = MapBase.importantItems;
-  $.each(tempArray, function () {
-    MapBase.highlightImportantItem(tempArray[0]);
-  });
+  MapBase.clearImportantItems();
 });
 
 // change cycles from menu (if debug options are enabled)

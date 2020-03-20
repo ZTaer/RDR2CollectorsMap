@@ -118,7 +118,6 @@ const Settings = SettingProxy.createSettingProxy('main');
 Object.entries({
   alertClosed: { default: false },
   baseLayer: { default: 'map.layers.default' },
-  date: {},
   isClock24Hour: { default: false },
   isClockVisible: { default: false },
   isCoordsOnClickEnabled: { default: false },
@@ -131,7 +130,7 @@ Object.entries({
   isPinsEditingEnabled: { default: true },
   isPinsPlacingEnabled: { default: false },
   isPopupsEnabled: { default: true },
-  isPopupsHoverEnabled: { default: true },
+  isPopupsHoverEnabled: { default: false },
   isRightClickEnabled: { default: false },
   isShadowsEnabled: { default: true },
   markerCustomColor: { default: 0 },
