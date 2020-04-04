@@ -13,9 +13,15 @@ var ItemsValue = {
   },
 
   reloadInventoryItems: function () {
+    'use strict';
     this.resetItemsData();
 
-    var inventoryItems = InventorySettings.isEnabled ? Inventory.items : MapBase.collectedItems;
+    let inventoryItems = {};
+    if (InventorySettings.isEnabled) {
+      inventoryItems = Inventory.items;
+    } else {
+      MapBase.markers.forEach(marker => inventoryItems[marker.text] = marker.isCollected);
+    }
 
     $.each(inventoryItems, function (key, value) {
       if (key.indexOf('random_item') !== -1)
@@ -63,6 +69,6 @@ var ItemsValue = {
   },
 
   updateValue: function () {
-    $('#items-value').text(`$${this.finalValue.toFixed(2)}`);
+    $('#items-value').text(!isNaN(this.finalValue) ? `$${this.finalValue.toFixed(2)}` : '$0.00');
   }
 };
