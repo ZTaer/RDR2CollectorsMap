@@ -80,7 +80,9 @@ class Marker {
         <p data-text="map.same_cycle_yesterday"></p>
       </span>
       <span class="marker-content-wrapper">
-          <div>${MapBase.getToolIcon(this.tool)}</div>
+          <div>
+            <img class="tool-type" height=32 width=32 src="assets/images/shovel.png">
+          </div>
           <p>
             <span data-text="map.item.unable"></span>
             <span data-text="${this.descriptionKey}" data-text-optional="true"></span>
@@ -121,16 +123,26 @@ class Marker {
         snippet.find('[data-text="map.unknown_cycle_description"]').hide();
       }
     }
-    if (this.tool != '-1') snippet.find('[data-text="map.item.unable"]').hide();
     if (!this.isWeekly) snippet.find('[data-text="weekly.desc"]').hide();
+    if (this.tool != '-1') snippet.find('[data-text="map.item.unable"]').hide();
+    const toolImg = snippet.find('.tool-type');
+    if (this.tool == '0') {
+      toolImg.hide();
+    } else {
+      toolImg.attr('src',
+        `assets/images/${{'-1': 'cross', 1: 'shovel', 2: 'magnet'}[this.tool]}.png`);
+    }
     if (!Settings.isDebugEnabled) snippet.find('.popupContentDebug').hide();
     if (!this.video) snippet.find('[data-text="map.video"]').parent().hide();
     if (['agarita', 'blood_flower'].includes(this.subdata)) {
       snippet.find('[data-text="map.mark_important"]').parent().hide();
     }
-    if (!InventorySettings.isEnabled || !InventorySettings.isPopupsEnabled || this.category === 'random') {
-      snippet.find('.marker-popup-buttons small').toggleClass('text-danger', this.amount >= InventorySettings.stackSize);
-      snippet.find('.marker-popup-buttons').hide();
+    if (InventorySettings.isEnabled && InventorySettings.isPopupsEnabled &&
+      this.category !== 'random') {
+        snippet.find('.marker-popup-buttons small').toggleClass('text-danger',
+          this.amount >= InventorySettings.stackSize);
+    } else {
+        snippet.find('.marker-popup-buttons').hide();
     }
 
     return Language.translateDom(snippet)[0];
