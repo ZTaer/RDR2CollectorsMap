@@ -63,7 +63,7 @@
 	"menu.random_spots": "随机收藏品地点",
 	"menu.collectables_counter": "已收集 {count} 共 {max}",
 	"menu.collection_counter": "{count} 的 {max}",
-	"menu.rdo_map": "动植物地图",
+	"menu.rdo_map": "RDO Map",
 	"menu.auto_refresh": "自动更改周期",
 	"menu.clear_inventory": "清除物品数量",
 	"menu.sell": "已有物品数量",
