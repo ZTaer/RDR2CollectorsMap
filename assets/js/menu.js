@@ -200,10 +200,15 @@ Menu.refreshMenu = function () {
   // Check cycle warning for random spots
   Menu.addCycleWarning('[data-text="menu.random_spots"]', Cycles.isSameAsYesterday('random'));
 
+<<<<<<< HEAD
   $.each(categoriesDisabledByDefault, function (key, value) {
     if (value.length > 0) {
       $('[data-type=' + value + ']').addClass('disabled');
     }
+=======
+  categories.forEach(cat => {
+    if (!enabledCategories.includes(cat)) $(`[data-type="${cat}"]`).addClass('disabled');
+>>>>>>> upstream/master
   });
 
   Menu.refreshWeeklyItems();
@@ -218,6 +223,7 @@ Menu.refreshCollectionCounter = function (category) {
     .replace('{max}', collectiblesElement.find('.collectible-wrapper').length));
 };
 
+<<<<<<< HEAD
 Menu.showAll = function () {
   $.each(categoryButtons, function (key, value) {
     $(value).removeClass("disabled");
@@ -234,12 +240,22 @@ Menu.hideAll = function () {
   $.each(categoryButtons, function (key, value) {
     $(value).addClass("disabled");
     $(`.menu-hidden[data-type=${$(value).attr('data-type')}]`).addClass("disabled");
+=======
+Menu.toggleAll = function (enable) {
+  $(".clickable[data-type]").each(function (index, value) {
+    $(value).toggleClass("disabled", !enable);
+    $(`.menu-hidden[data-type=${$(value).attr('data-type')}]`).toggleClass("disabled", !enable);
+>>>>>>> upstream/master
   });
 
-  enabledCategories = [];
+  enabledCategories = enable ? categories : [];
 
   MapBase.addMarkers();
+<<<<<<< HEAD
   Treasure.toggleAll(false);
+=======
+  Treasure.onCategoryToggle();
+>>>>>>> upstream/master
 };
 
 Menu.refreshItemsCounter = function () {

@@ -5,6 +5,12 @@ class Treasure {
     this.treasures = [];
     this.layer = L.layerGroup();
     this.layer.addTo(MapBase.map);
+<<<<<<< HEAD
+=======
+    const pane = MapBase.map.createPane('treasureX');
+    pane.style.zIndex = 450;  // X-markers on top of circle, but behind “normal” markers/shadows
+    pane.style.pointerEvents = 'none';
+>>>>>>> upstream/master
     this.context = $('.menu-hidden[data-type=treasure]');
     this.crossIcon = L.icon({
       iconUrl: './assets/images/icons/cross.png',
@@ -18,6 +24,14 @@ class Treasure {
         this.onLanguageChanged();
         console.info('%c[Treasures] Loaded!', 'color: #bada55; background: #242424');
       });
+<<<<<<< HEAD
+=======
+    $('.menu-hidden[data-type="treasure"] > *:first-child a').click(e => {
+      e.preventDefault();
+      Treasure.treasures.forEach(treasure =>
+        treasure.onMap = ($(e.target).attr('data-text') === 'menu.show_all'));
+    });
+>>>>>>> upstream/master
   }
   static onLanguageChanged () {
     Menu.reorderMenu(this.context);
@@ -56,19 +70,36 @@ class Treasure {
       color: "#fff79900",
       fillColor: "#fff799",
       fillOpacity: 0.5,
+<<<<<<< HEAD
       radius: this.radius
+=======
+      radius: this.radius,
+>>>>>>> upstream/master
     }));
     this.marker.addLayer(L.marker([this.x, this.y], {icon: Treasure.mainIcon})
       .bindPopup(this.popupContent.bind(this), { minWidth: 300 })
     );
+<<<<<<< HEAD
     this.treasures.forEach(cross =>
       this.marker.addLayer(L.marker([cross.x, cross.y], {icon: Treasure.crossIcon})));
+=======
+    this.locations.forEach(cross =>
+      this.marker.addLayer(L.marker([cross.x, cross.y], {
+        icon: Treasure.crossIcon,
+        pane: 'treasureX',
+      }))
+    );
+>>>>>>> upstream/master
     this.onMap = this.onMap;
   }
   popupContent() {
     const snippet = $(`<div class="handover-wrapper-with-no-influence">
         <h1 data-text="${this.text}"></h1>
+<<<<<<< HEAD
         <button type="button" class="btn btn-info remove-button" data-text="map.remove_add">
+=======
+        <button type="button" class="btn btn-info remove-button" data-text="map.remove">
+>>>>>>> upstream/master
           </button>
       </div>`).translate();
     snippet.find('button').on('click', () => this.onMap = false);
@@ -76,7 +107,12 @@ class Treasure {
   }
   set onMap (state) {
     if (state) {
+<<<<<<< HEAD
       Treasure.layer.addLayer(this.marker);
+=======
+      const method = enabledCategories.includes('treasure') ? 'addLayer' : 'removeLayer';
+      Treasure.layer[method](this.marker);
+>>>>>>> upstream/master
       this.element.removeClass('disabled')
       localStorage.setItem(this._shownKey, 'true');
     } else {
@@ -88,7 +124,12 @@ class Treasure {
   get onMap () {
     return !!localStorage.getItem(this._shownKey);
   }
+<<<<<<< HEAD
   static toggleAll (enabled) {
     Treasure.treasures.forEach(treasure => treasure.onMap = enabled);
+=======
+  static onCategoryToggle () {
+    Treasure.treasures.forEach(treasure => treasure.onMap = treasure.onMap);
+>>>>>>> upstream/master
   }
 }

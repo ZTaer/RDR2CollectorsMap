@@ -28,14 +28,11 @@ var categories = [
   'fast_travel', 'treasure', 'random', 'user_pins'
 ];
 
-var categoriesDisabledByDefault =
-  JSON.parse(localStorage.getItem("disabled-categories")) || ['random'];
-
-var enabledCategories = categories.filter(item => !categoriesDisabledByDefault.includes(item));
-
-var categoryButtons = $(".clickable[data-type]");
-
-var debugMarkersArray = [];
+var enabledCategories = JSON.parse(localStorage.getItem("enabled-categories"));
+if (!enabledCategories) {
+  const disabledCats = JSON.parse(localStorage.getItem("disabled-categories")) || ['random'];
+  enabledCategories = categories.filter(item => !disabledCats.includes(item));
+}
 
 /*
 - Leaflet extentions require Leaflet loaded
@@ -427,20 +424,18 @@ $('.clickable').on('click', function () {
     enabledCategories = $.grep(enabledCategories, function (value) {
       return value != menu.data('type');
     });
-
-    categoriesDisabledByDefault.push(menu.data('type'));
   } else {
     enabledCategories.push(menu.data('type'));
-
-    categoriesDisabledByDefault = $.grep(categoriesDisabledByDefault, function (value) {
-      return value != menu.data('type');
-    });
   }
 
-  localStorage.setItem("disabled-categories", JSON.stringify(categoriesDisabledByDefault));
+  localStorage.setItem("enabled-categories", JSON.stringify(enabledCategories));
 
   if (menu.data('type') == 'treasure')
+<<<<<<< HEAD
     Treasure.toggleAll(!isDisabled);
+=======
+    Treasure.onCategoryToggle();
+>>>>>>> upstream/master
   else if (menu.data('type') == 'user_pins')
     Pins.addToMap();
   else
