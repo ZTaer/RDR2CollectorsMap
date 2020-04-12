@@ -18,6 +18,7 @@ class Treasure {
       iconAnchor: [8, 8]
     });
     this.onSettingsChanged();
+<<<<<<< HEAD
     $.getJSON('data/treasures.json?nocache=' + nocache)
       .done(data => {
         data.forEach(item => this.treasures.push(new Treasure(item)));
@@ -26,10 +27,17 @@ class Treasure {
       });
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> upstream/master
     $('.menu-hidden[data-type="treasure"] > *:first-child a').click(e => {
       e.preventDefault();
-      Treasure.treasures.forEach(treasure =>
-        treasure.onMap = ($(e.target).attr('data-text') === 'menu.show_all'));
+      const showAll = $(e.target).attr('data-text') === 'menu.show_all';
+      Treasure.treasures.forEach(treasure => treasure.onMap = showAll);
+    });
+    return $.getJSON('data/treasures.json?nocache=' + nocache).then(data => {
+      data.forEach(item => this.treasures.push(new Treasure(item)));
+      this.onLanguageChanged();
+      console.info('%c[Treasures] Loaded!', 'color: #bada55; background: #242424');
     });
 >>>>>>> upstream/master
   }

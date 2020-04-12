@@ -97,9 +97,13 @@ function init() {
   Inventory.init();
   MapBase.loadFastTravels();
   MadamNazar.loadMadamNazar();
-  Treasure.init();
+  const treasureFinished = Treasure.init();
   MapBase.loadMarkers();
   Routes.init();
+  // depends on MapBase, Treasure, Pins
+  // via `promise.then()`, the Treasure dependency is _guaranteed_ to have finished
+  // the other two still need a little rewriting
+  treasureFinished.then(Menu.activateHandlers);
 
   if (Settings.isMenuOpened) $('.menu-toggle').click();
 
@@ -413,6 +417,7 @@ $('#custom-marker-color').on("change", function () {
   MapBase.addMarkers();
 });
 
+<<<<<<< HEAD
 //Disable & enable collection category
 $('.clickable').on('click', function () {
   var menu = $(this);
@@ -443,6 +448,8 @@ $('.clickable').on('click', function () {
     MapBase.addMarkers();
 });
 
+=======
+>>>>>>> upstream/master
 //Open collection submenu
 $('.open-submenu').on('click', function (e) {
   e.stopPropagation();
